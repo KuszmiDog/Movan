@@ -1,13 +1,11 @@
-import { View, Text, Image, ScrollView, StyleSheet, ActivityIndicator, Button } from 'react-native'
+import { View, Text, Image, StyleSheet, ActivityIndicator } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import imagePath from "@/src/constants/imagePaths"
 import { moderateScale } from "react-native-size-matters"
-import { Link, Stack } from 'expo-router'
-import BottomComponents from '@/src/components/atoms/BottomComponents'
 
 
-const movan_introduction = () => {
+const TermsAndC = () => {
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -23,11 +21,13 @@ const movan_introduction = () => {
         <View style={styles.movanlogo}>
             <Image source={imagePath.iconMovan} style={styles.logoimage}/>
             <Text style={styles.textLogo}>Transportá. Conectá. Mové.</Text>
+            <Text style={styles.textLogo}>Transportá. Conectá. Mové.</Text>
+            <Text style={styles.textLogo}>Transportá. Conectá. Mové.</Text>
+            <Text style={styles.textLogo}>Transportá. Conectá. Mové.</Text>
         </View>positories
         <View style={styles.mApacheLogo}>
           {isLoading ? (
             <>
-              <BottomComponents tittle="Siguiente" navigateTo='TermsAndC'></BottomComponents>
               <Image source={imagePath.iconMApache} style={styles.mApacheLogoImage}/>
               <Text style={styles.mApacheFont}>from mApache</Text> 
             </>
@@ -106,4 +106,4 @@ const styles = StyleSheet.create({
 
 })
 
-export default movan_introduction
+export default TermsAndC

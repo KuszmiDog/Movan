@@ -29,6 +29,8 @@ const style = StyleSheet.create({
         paddingHorizontal: verticalScale(50),
         borderRadius: moderateScale(5),
         bottom:250,
+        alignItems: "center",
+        justifyContent: "center",
     },
 
     bottomText:{
@@ -38,5 +40,6 @@ const style = StyleSheet.create({
     }
     
 })
+
 
 export default BottomComponents

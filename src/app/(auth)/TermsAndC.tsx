@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import imagePath from "@/src/constants/imagePaths"
 import { moderateScale } from "react-native-size-matters"
-
+import TermsAndCon from '@/src/components/atoms/TermsAndCon'
 
 const TermsAndC = () => {
 
@@ -19,27 +19,17 @@ const TermsAndC = () => {
     
     <SafeAreaView style={styles.container} >
         <View style={styles.movanlogo}>
-            <Image source={imagePath.iconMovan} style={styles.logoimage}/>
-            <Text style={styles.textLogo}>Transportá. Conectá. Mové.</Text>
-            <Text style={styles.textLogo}>Transportá. Conectá. Mové.</Text>
-            <Text style={styles.textLogo}>Transportá. Conectá. Mové.</Text>
-            <Text style={styles.textLogo}>Transportá. Conectá. Mové.</Text>
-        </View>positories
-        <View style={styles.mApacheLogo}>
-          {isLoading ? (
-            <>
-              <Image source={imagePath.iconMApache} style={styles.mApacheLogoImage}/>
-              <Text style={styles.mApacheFont}>from mApache</Text> 
-            </>
-          ) : 
-          (
-            <>
-              <ActivityIndicator size={moderateScale(48)} color={"white"}/>
-              <Text style={styles.mApacheFont}>Loading...</Text>
-            </>
-          )}
+          <Image source={imagePath.iconMovan} style={styles.logoimage}/>
+          <Text style={styles.textLogo}>Transportá. Conectá. Mové.</Text>  
+        </View>
 
-          
+        <View>
+          <TermsAndCon/>
+        </View>
+
+        <View style={styles.mApacheLogo}>
+          <Image source={imagePath.iconMApache} style={styles.mApacheLogoImage}/>
+          <Text style={styles.mApacheFont}>from mApache</Text>
         </View>
         
     </SafeAreaView>

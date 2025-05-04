@@ -1,4 +1,4 @@
-import { View, Text, Image, StyleSheet, ActivityIndicator } from 'react-native'
+import { View, Text, Image, StyleSheet } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import imagePath from "@/src/constants/imagePaths"
@@ -75,6 +75,9 @@ const styles = StyleSheet.create({
   },  
 
   mApacheFont: {
+    textShadowColor: 'black', 
+    textShadowOffset: { width: -1, height: 0 },
+    textShadowRadius: 10,
     fontSize: 15,
     color: "white",
     fontWeight: "500",
@@ -84,14 +87,6 @@ const styles = StyleSheet.create({
   header:{
     alignItems: "center",
     gap: moderateScale(30)
-  },
-
-  body:{
-
-  },
-
-  footer:{
-
   },
 
 })

@@ -107,8 +107,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     top: 15,
-    left: 60,
-    maxWidth: 220
+    alignSelf: "center", // Centra el botón horizontalmente
+    minWidth: 220, // Asegura un ancho mínimo suficiente
   },
 
   bottomText:{

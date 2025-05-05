@@ -21,25 +21,25 @@ const BottomComponents = ({tittle, navigateTo}: Props) => {
 }
 
 const style = StyleSheet.create({
-    bottomContainer:{
-        backgroundColor: "#262E93",
-        width: "100%",
+  bottomContainer: {
+      backgroundColor: "#262E93",
+      paddingVertical: verticalScale(10),
+      paddingHorizontal: verticalScale(20), // Reduce el padding horizontal
+      borderRadius: moderateScale(5),
+      bottom: 250,
+      alignItems: "center",
+      justifyContent: "center",
+      alignSelf: "center", // Centra el botón horizontalmente
+      minWidth: 150, // Asegura un ancho mínimo suficiente
+  },
 
-        paddingVertical: verticalScale(10),
-        paddingHorizontal: verticalScale(50),
-        borderRadius: moderateScale(5),
-        bottom:250,
-        alignItems: "center",
-        justifyContent: "center",
-    },
-
-    bottomText:{
-        fontFamily: "Roboto",
-        color: "white",
-        fontSize: 22
-    }
-    
-})
+  bottomText: {
+      fontFamily: "Roboto",
+      color: "white",
+      fontSize: 22,
+      textAlign: "center", // Asegura que el texto esté centrado
+  },
+});
 
 
 export default BottomComponents

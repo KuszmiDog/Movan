@@ -22,7 +22,7 @@ const movan_introduction = () => {
         <View style={styles.movanlogo}>
             <Image source={imagePath.iconMovan} style={styles.logoimage}/>
             <Text style={styles.textLogo}>Transportá. Conectá. Mové.</Text>
-        </View>positories
+        </View>
         <View style={styles.mApacheLogo}>
           {isLoading ? (
             <>

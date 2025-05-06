@@ -1,3 +1,4 @@
+import React from 'react';
 import { Text, View, TouchableOpacity, StyleSheet } from "react-native";
 import {MaterialIcons} from "@expo/vector-icons";
 
@@ -10,6 +11,7 @@ const CheckBox = ({options, checkedvalues, OnChange, style}) => {
                 
                 return (
                     <TouchableOpacity 
+                        key={option.value}  // Ensure a unique key is provided 
                         style={active ? [styles.CheckBox, styles.activeCheckBox] : styles.CheckBox}
                         onPress={() => {
                             if(active) {

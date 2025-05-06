@@ -19,11 +19,11 @@ const RolSelection = () => {
 
     // Navegar según el rol seleccionado
     if (selectedRole === 'private') {
-      router.push('/(AccountCreation)/PrivateTransport');
+      router.push('/(AccountCreation)/IndividualLogic/Individual');
     } else if (selectedRole === 'transport') {
-      router.push('/(AccountCreation)/Transport');
+      router.push('/(AccountCreation)/TransportLogic/Transport');
     } else if (selectedRole === 'individual') {
-      router.push('/(AccountCreation)/Individual');
+      router.push('/(AccountCreation)/PrivateTransportLogic/PrivateTransport');
     }
   };
 

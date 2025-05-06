@@ -4,15 +4,22 @@ import { moderateScale, verticalScale } from 'react-native-size-matters';
 import imagePath from '@/src/constants/imagePaths';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import BottomComponents from '@/src/components/atoms/BottomComponents';
+import { useRouter } from 'expo-router';
+
 
 const CreateAccount = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const router = useRouter(); // Hook para manejar la navegación
+
 
   const handleCreateAccount = () => {
     // Lógica para crear la cuenta
     console.log('Crear cuenta con:', { username, email, password });
+    router.push('/(AccountCreation)/RolSelection'); // Navegar a RolSelection
+
   };
 
   return (

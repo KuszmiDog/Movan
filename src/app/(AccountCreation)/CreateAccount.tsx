@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#565EB3',
     alignItems: 'center',
-    padding: verticalScale(20),
+    padding: verticalScale(40),
   },
   title: {
     fontSize: 24,
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
   footerText: {
     color: 'white',
     fontSize: 14,
-    marginTop: verticalScale(20),
+    marginTop: verticalScale(160),
     textAlign: 'center',
   },
 });

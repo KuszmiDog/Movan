@@ -20,10 +20,7 @@ const TermsAndCon = () => {
             )}
             
             <Text style={styles.text}>
-                En estos términos y condiciones usted le está entregando la cola a Movan, y por lo tanto a la empresa mApache. 
-                De manera obvia, esto rotula un compromiso de esclavitud para usted y para toda su descendencia a partir de la 
-                3ra generación hacia abajo de quien acepte los términos y condiciones. Los ingresos de su familia serán 
-                recaudados periódicamente para fungir de inversión en Movan. Gracias.
+                Lorem ipsum dolor, sit amet consectetur adipisicing elit. Exercitationem non aut mollitia dolorum, labore cum aperiam soluta quo, corporis eius, obcaecati et ullam. Aliquid, illum quod ratione quaerat quasi tenetur!
             </Text>
 
             <CheckBox  
@@ -52,9 +49,11 @@ const styles = StyleSheet.create({
         padding: 18,
     },
     buttonlocation:{
-        top: 190,
-        width: 220,
-        left: 40
+        top: verticalScale(100),
+        width: "100%",
+        left: moderateScale(20),
+        position: "absolute",
+        zIndex: 1,
       },
 
 })

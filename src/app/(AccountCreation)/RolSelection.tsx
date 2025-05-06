@@ -1,23 +1,23 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 
-
 const RolSelection = () => {
   const [selectedRole, setSelectedRole] = useState(null);
+  const [infoVisible, setInfoVisible] = useState(false);
+  const [infoText, setInfoText] = useState('');
   const router = useRouter();
 
   const roles = [
-    { label: 'Transportista Privado', value: 'private' },
-    { label: 'Transporte', value: 'transport' },
-    { label: 'Particular', value: 'individual' },
+    { label: 'Transportista Privado', value: 'private', description: 'Un transportista privado realiza envíos de manera independiente.' },
+    { label: 'Transporte', value: 'transport', description: 'Un transporte es una empresa que ofrece servicios de envío.' },
+    { label: 'Particular', value: 'individual', description: 'Un particular utiliza la aplicación para envíos personales.' },
   ];
 
   const handleNext = () => {
     console.log('Rol seleccionado:', selectedRole);
 
-    // Navegar según el rol seleccionado
     if (selectedRole === 'private') {
       router.push('/(AccountCreation)/IndividualLogic/Individual');
     } else if (selectedRole === 'transport') {
@@ -27,24 +27,30 @@ const RolSelection = () => {
     }
   };
 
+  const showInfo = (description) => {
+    setInfoText(description);
+    setInfoVisible(true);
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>¿Qué Rol te gustaría adoptar en la aplicación?</Text>
 
       <View style={styles.optionsContainer}>
         {roles.map((role) => (
-          <TouchableOpacity
-            key={role.value}
-            style={styles.option}
-            onPress={() => setSelectedRole(role.value)}
-          >
-            <MaterialCommunityIcons
-              name={selectedRole === role.value ? 'radiobox-marked' : 'radiobox-blank'}
-              size={24}
-              color="white"
-            />
-            <Text style={styles.optionText}>{role.label}</Text>
-          </TouchableOpacity>
+          <View key={role.value} style={styles.option}>
+            <TouchableOpacity onPress={() => setSelectedRole(role.value)} style={styles.roleContainer}>
+              <MaterialCommunityIcons
+                name={selectedRole === role.value ? 'radiobox-marked' : 'radiobox-blank'}
+                size={24}
+                color="white"
+              />
+              <Text style={styles.optionText}>{role.label}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => showInfo(role.description)}>
+              <MaterialCommunityIcons name="information-outline" size={24} color="white" />
+            </TouchableOpacity>
+          </View>
         ))}
       </View>
 
@@ -57,6 +63,23 @@ const RolSelection = () => {
       </TouchableOpacity>
 
       <Text style={styles.footerText}>from mApache</Text>
+
+      {/* Modal para mostrar información */}
+      <Modal
+        visible={infoVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setInfoVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>{infoText}</Text>
+            <TouchableOpacity style={styles.closeButton} onPress={() => setInfoVisible(false)}>
+              <Text style={styles.closeButtonText}>Cerrar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -83,7 +106,13 @@ const styles = StyleSheet.create({
   option: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: 15,
+    paddingHorizontal: 10,
+  },
+  roleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   optionText: {
     color: 'white',
@@ -116,6 +145,35 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 20,
     textAlign: 'center',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+    alignItems: 'center',
+  },
+  modalText: {
+    fontSize: 16,
+    color: '#333',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  closeButton: {
+    backgroundColor: '#262E93',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  closeButtonText: {
+    color: 'white',
+    fontSize: 16,
   },
 });
 

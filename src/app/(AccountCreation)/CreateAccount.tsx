@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
   socialContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: moderateScale(20),
+    alignItems: 'center'
   },
   socialIcon: {
     width: 50,
@@ -131,7 +131,6 @@ const styles = StyleSheet.create({
   footerText: {
     color: 'white',
     fontSize: 14,
-    marginTop: verticalScale(160),
     textAlign: 'center',
   },
 });

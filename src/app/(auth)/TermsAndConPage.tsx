@@ -1,9 +1,9 @@
-import { View, Text, Image, StyleSheet, ActivityIndicator } from 'react-native'
+import { View, Text, Image, StyleSheet } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import imagePath from "@/src/constants/imagePaths"
 import { moderateScale } from "react-native-size-matters"
-
+import TermsAndCon from '@/src/components/atoms/TermsAndCon'
 
 const TermsAndC = () => {
 
@@ -19,27 +19,17 @@ const TermsAndC = () => {
     
     <SafeAreaView style={styles.container} >
         <View style={styles.movanlogo}>
-            <Image source={imagePath.iconMovan} style={styles.logoimage}/>
-            <Text style={styles.textLogo}>Transportá. Conectá. Mové.</Text>
-            <Text style={styles.textLogo}>Transportá. Conectá. Mové.</Text>
-            <Text style={styles.textLogo}>Transportá. Conectá. Mové.</Text>
-            <Text style={styles.textLogo}>Transportá. Conectá. Mové.</Text>
-        </View>positories
-        <View style={styles.mApacheLogo}>
-          {isLoading ? (
-            <>
-              <Image source={imagePath.iconMApache} style={styles.mApacheLogoImage}/>
-              <Text style={styles.mApacheFont}>from mApache</Text> 
-            </>
-          ) : 
-          (
-            <>
-              <ActivityIndicator size={moderateScale(48)} color={"white"}/>
-              <Text style={styles.mApacheFont}>Loading...</Text>
-            </>
-          )}
+          <Image source={imagePath.iconMovan} style={styles.logoimage}/>
+          <Text style={styles.textLogo}>Transportá. Conectá. Mové.</Text>  
+        </View>
 
-          
+        <View>
+          <TermsAndCon/>
+        </View>
+
+        <View style={styles.mApacheLogo}>
+          <Image source={imagePath.iconMApache} style={styles.mApacheLogoImage}/>
+          <Text style={styles.mApacheFont}>from mApache</Text>
         </View>
         
     </SafeAreaView>
@@ -85,6 +75,9 @@ const styles = StyleSheet.create({
   },  
 
   mApacheFont: {
+    textShadowColor: 'black', 
+    textShadowOffset: { width: -1, height: 0 },
+    textShadowRadius: 10,
     fontSize: 15,
     color: "white",
     fontWeight: "500",
@@ -94,14 +87,6 @@ const styles = StyleSheet.create({
   header:{
     alignItems: "center",
     gap: moderateScale(30)
-  },
-
-  body:{
-
-  },
-
-  footer:{
-
   },
 
 })

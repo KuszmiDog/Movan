@@ -1,9 +1,8 @@
-import { View, Text, Image, ScrollView, StyleSheet, ActivityIndicator, Button } from 'react-native'
+import { View, Text, Image, StyleSheet, ActivityIndicator } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import imagePath from "@/src/constants/imagePaths"
 import { moderateScale } from "react-native-size-matters"
-import { Link, Stack } from 'expo-router'
 import BottomComponents from '@/src/components/atoms/BottomComponents'
 
 
@@ -23,11 +22,11 @@ const movan_introduction = () => {
         <View style={styles.movanlogo}>
             <Image source={imagePath.iconMovan} style={styles.logoimage}/>
             <Text style={styles.textLogo}>Transportá. Conectá. Mové.</Text>
-        </View>positories
+        </View>
         <View style={styles.mApacheLogo}>
           {isLoading ? (
             <>
-              <BottomComponents tittle="Siguiente" navigateTo='TermsAndC'></BottomComponents>
+              <BottomComponents tittle="Siguiente" navigateTo='TermsAndConPage'></BottomComponents>
               <Image source={imagePath.iconMApache} style={styles.mApacheLogoImage}/>
               <Text style={styles.mApacheFont}>from mApache</Text> 
             </>
@@ -81,29 +80,23 @@ const styles = StyleSheet.create({
   mApacheLogoImage: {
     width: 65,
     height: 40,
-    
   },  
 
   mApacheFont: {
     fontSize: 15,
     color: "white",
     fontWeight: "500",
-    bottom: 20
+    bottom: 20,
+
+    textShadowColor: 'black', 
+    textShadowOffset: { width: -1, height: 0 },
+    textShadowRadius: 10,
   },
 
   header:{
     alignItems: "center",
     gap: moderateScale(30)
-  },
-
-  body:{
-
-  },
-
-  footer:{
-
-  },
-
+  }
 })
 
 export default movan_introduction

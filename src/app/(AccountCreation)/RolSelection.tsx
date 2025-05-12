@@ -19,12 +19,12 @@ const RolSelection = () => {
     console.log('Rol seleccionado:', selectedRole);
 
     if (selectedRole === 'private') {
-      router.push('/(AccountCreation)/IndividualLogic/Individual');
-    } else if (selectedRole === 'transport') {
+      router.push('/(AccountCreation)/PrivateTransportLogic/PrivateTransport');
+      } else if (selectedRole === 'transport') {
       router.push('/(AccountCreation)/TransportLogic/Transport');
     } else if (selectedRole === 'individual') {
-      router.push('/(AccountCreation)/PrivateTransportLogic/PrivateTransport');
-    }
+      router.push('/(AccountCreation)/IndividualLogic/Individual');
+      }
   };
 
   const showInfo = (description) => {

@@ -1,19 +1,19 @@
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { moderateScale, verticalScale } from 'react-native-size-matters';
 
-const TransportID = () => {
-  const [selectedCountry, setSelectedCountry] = useState('');
-  const [selectedDocumentType, setSelectedDocumentType] = useState('');
-  const [documentNumber, setDocumentNumber] = useState('');
+const PTC_OwnOptions = () => {
+  const [Model, setModel] = useState('');
+  const [Branch, setBranch] = useState('');
+  const [Year, setYear] = useState('');
 
   const handleNext = () => {
     console.log('Datos ingresados:', {
-      selectedCountry,
-      selectedDocumentType,
-      documentNumber,
+        Model,
+        Branch,
+        Year,
     });
     router.push('/IndividualLogic/IndividualPhone'); // Navegar a la siguiente pantalla
   };
@@ -21,45 +21,58 @@ const TransportID = () => {
   return (
     <View style={styles.container}>
       <View style={styles.body}>
-        <Text style={styles.text}>Selecciona tu documento de identificación</Text>
-        <Text style={styles.label}>Selecciona el país del documento</Text>
+        <Text style={styles.text}>Completa con la informacion de tu vehiculo</Text>
+        <Text style={styles.label}>Marca</Text>
         <Picker
-          selectedValue={selectedCountry}
-          onValueChange={(itemValue) => setSelectedCountry(itemValue)}
+          selectedValue={Model}
+          onValueChange={(itemValue) => setModel(itemValue)}
           style={styles.input}
         >
-          <Picker.Item label="Seleccione un país" value="" />
-          <Picker.Item label="Argentina" value="Argentina" />
-          <Picker.Item label="Paraguay" value="Paraguay" />
-          <Picker.Item label="Colombia" value="Colombia" />
-          <Picker.Item label="Perú" value="Perú" />
-          <Picker.Item label="Ecuador" value="Ecuador" />
-          <Picker.Item label="Uruguay" value="Uruguay" />
-          <Picker.Item label="Chile" value="Chile" />
+          <Picker.Item label="Seleccione Marca..." value="" />
+          <Picker.Item label="Volvo" value="Volvo" />
+          <Picker.Item label="Iveco" value="Iveco" />
+          <Picker.Item label="Scania" value="Scania" />
+          <Picker.Item label="Mercedes-Benz" value="Mercedes-Benz" />
+          <Picker.Item label="DAF" value="DAF" />
+          <Picker.Item label="MAN" value="MAN" />
+          <Picker.Item label="Renault Trucks" value="Renault Trucks" />
           {/* Agrega más países aquí */}
         </Picker>
 
-        <Text style={styles.label}>Tipo de documento</Text>
+        <Text style={styles.label}>Modelo</Text>
         <Picker
-          selectedValue={selectedDocumentType}
-          onValueChange={(itemValue) => setSelectedDocumentType(itemValue)}
+          selectedValue={Branch}
+          onValueChange={(itemValue) => setBranch(itemValue)}
           style={styles.input}
         >
-          <Picker.Item label="Seleccione un tipo de documento" value="" />
-          <Picker.Item label="DNI" value="DNI" />
-          <Picker.Item label="Pasaporte" value="Pasaporte" />
-          <Picker.Item label="Licencia de conducir" value="Licencia" />
+          <Picker.Item label="Seleccione Modelo..." value="" />
+          <Picker.Item label="DAF XF" value="DAF XF" />
+          <Picker.Item label="DAF CF" value="DAF CF" />
+          <Picker.Item label="Kenworth T680" value="Kenworth T680" />
+          <Picker.Item label="Renault T High" value="Renault T High" />
+          <Picker.Item label="International LT Series" value="International LT Series" />
+          <Picker.Item label="Hino 500 Series" value="Hino 500 Series" />
           {/* Agrega más tipos de documentos aquí */}
         </Picker>
 
-        <Text style={styles.label}>Ingrese su número de documento</Text>
-        <TextInput
+        <Text style={styles.label}>Anio</Text>
+        <Picker
+          selectedValue={Year}
+          onValueChange={(itemValue) => setYear(itemValue)}
           style={styles.input}
-          placeholder="Número de documento"
-          value={documentNumber}
-          onChangeText={setDocumentNumber}
-          keyboardType="numeric"
-        />
+        >
+          <Picker.Item label="Seleccione Anio..." value="" />
+          <Picker.Item label="2021" value="2021" />
+          <Picker.Item label="2020" value="2020" />
+          <Picker.Item label="2019" value="2019" />
+          <Picker.Item label="2018" value="2018" />
+          <Picker.Item label="2017" value="2017" />
+          <Picker.Item label="2016" value="2016" />
+          <Picker.Item label="2015" value="2015" />
+          <Picker.Item label="2014" value="2014" />
+          <Picker.Item label="2013" value="2013" />
+          {/* Agrega más tipos de documentos aquí */}
+        </Picker>
 
         <TouchableOpacity style={styles.button} onPress={handleNext}>
           <Text style={styles.buttonText}>Siguiente</Text>
@@ -137,4 +150,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TransportID;
+export default PTC_OwnOptions;

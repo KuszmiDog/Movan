@@ -6,10 +6,10 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import BottomComponents from '@/src/components/atoms/BottomComponents';
 import { useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 const CreateAccount = () => {
-  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter(); // Hook para manejar la navegación
@@ -17,22 +17,15 @@ const CreateAccount = () => {
 
   const handleCreateAccount = () => {
     // Lógica para crear la cuenta
-    console.log('Crear cuenta con:', { username, email, password });
+    console.log('Crear cuenta con:', { email, password });
     router.push('/(AccountCreation)/RolSelection'); // Navegar a RolSelection
 
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Creación de Cuenta</Text>
-
-      <Text style={styles.label}>Crea Tu nombre de usuario</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Nombre de usuario"
-        value={username}
-        onChangeText={setUsername}
-      />
+    <SafeAreaView style={styles.background}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Creación de Cuenta</Text>
 
       <Text style={styles.label}>Ingresa un Correo Electrónico</Text>
       <TextInput
@@ -64,12 +57,18 @@ const CreateAccount = () => {
       </View>
 
       <Text style={styles.footerText}>from mApache</Text>
-    </View>
+      </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    backgroundColor: '#565EB3' 
+  },
   container: {
+    top: 100,
     flex: 1,
     backgroundColor: '#565EB3',
     alignItems: 'center',

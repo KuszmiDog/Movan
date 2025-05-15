@@ -95,6 +95,7 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(30),
   },
   label: {
+    left: 8,
     fontSize: 16,
     color: 'white',
     alignSelf: 'flex-start',
@@ -102,7 +103,7 @@ const styles = StyleSheet.create({
   },
   input: {
     width: moderateScale(310),
-    height: verticalScale(40),
+    height: verticalScale(50),
     backgroundColor: 'white',
     borderRadius: moderateScale(10),
     padding: verticalScale(10),

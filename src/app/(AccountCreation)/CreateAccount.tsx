@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { moderateScale, verticalScale } from 'react-native-size-matters';
-import imagePath from '@/src/constants/imagePaths';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import BottomComponents from '@/src/components/atoms/BottomComponents';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -51,12 +48,16 @@ const CreateAccount = () => {
 
       <Text style={styles.orText}>O crea tu cuenta con</Text>
 
-      <View style={styles.iconContainer}>
-      <MaterialCommunityIcons name="facebook" size={50} color="white" />
-      <MaterialCommunityIcons name="google" size={50} color="#DB4437" />
+      <View style={styles.accountcreation}>
+        <View style={styles.iconContainer}>
+          <MaterialCommunityIcons name="facebook" size={50} color="white" />
+          <MaterialCommunityIcons name="google" size={50} color="white" />
+          <MaterialCommunityIcons name="instagram" size={50} color="white" />
+        </View>
       </View>
-
-      <Text style={styles.footerText}>from mApache</Text>
+        <View style={styles.footer}>
+            <Text style={styles.footerText}>from mApache</Text>
+          </View>
       </View>
     </SafeAreaView>
   );
@@ -82,7 +83,9 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     flexDirection: 'row',
-    gap: 20,
+    gap: 55,
+    alignItems: "center"
+
   },
   label: {
     fontSize: 16,
@@ -117,6 +120,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     marginVertical: verticalScale(15),
+    top: 150
   },
   socialContainer: {
     flexDirection: 'row',
@@ -127,11 +131,21 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
   },
+  footer: {
+    bottom: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: verticalScale(190),
+  },
   footerText: {
     color: 'white',
     fontSize: 14,
     textAlign: 'center',
   },
+  accountcreation:{
+    top:150
+  }
+  
 });
 
 export default CreateAccount;

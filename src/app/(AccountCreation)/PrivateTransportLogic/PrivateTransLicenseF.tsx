@@ -34,6 +34,8 @@ const PrivateTransLicenseF = () => {
                         <Text style={styles.footerText}>from mApache</Text>
                     </View>
                 </View>
+
+                
     </SafeAreaView>
   )
 }

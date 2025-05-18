@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: '#565EB3',
-    gap:10
+    gap:8
   },
   title: {
     bottom: 70,
@@ -91,12 +91,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   formtext:{
-    fontSize: 20,
-    fontWeight: "600",
-    color: "white",
-    textShadowColor: 'black', 
-    textShadowOffset: { width: -1, height: 0 },
-    textShadowRadius: 10,
+    fontSize: 16,
+    color: 'white',
+    alignSelf: 'flex-start',
+    marginLeft: moderateScale(20),
+    marginBottom: verticalScale(5),
+    right: 20,
   },
 
   EnterButton:{
@@ -150,8 +150,6 @@ const styles = StyleSheet.create({
     fontWeight: 800,
     fontStyle: "normal"
   },
-
-
 
   error: {
     color: 'white',

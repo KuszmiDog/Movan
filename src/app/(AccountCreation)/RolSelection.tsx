@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { verticalScale } from 'react-native-size-matters';
 
 const RolSelection = () => {
   const [selectedRole, setSelectedRole] = useState(null);
@@ -62,8 +63,9 @@ const RolSelection = () => {
         <Text style={styles.buttonText}>Siguiente</Text>
       </TouchableOpacity>
 
-      <Text style={styles.footerText}>from mApache</Text>
-
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>from mApache</Text>
+      </View>
       {/* Modal para mostrar información */}
       <Modal
         visible={infoVisible}
@@ -140,12 +142,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
-  footerText: {
-    color: 'white',
-    fontSize: 14,
-    marginTop: 20,
-    textAlign: 'center',
-  },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -175,6 +171,17 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
   },
+  footer: {
+    bottom: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+    top: 230,
+  },
+  footerText: {
+    color: 'white',
+    fontSize: 14,
+    textAlign: 'center',
+  }
 });
 
 export default RolSelection;

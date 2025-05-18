@@ -87,9 +87,6 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "500",
     bottom: 20,
-
-    textShadowColor: 'black', 
-    textShadowOffset: { width: -1, height: 0 },
     textShadowRadius: 10,
   },
 

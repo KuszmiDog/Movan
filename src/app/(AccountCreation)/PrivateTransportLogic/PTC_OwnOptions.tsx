@@ -15,7 +15,7 @@ const PTC_OwnOptions = () => {
         Branch,
         Year,
     });
-    router.push('/IndividualLogic/IndividualPhone'); // Navegar a la siguiente pantalla
+    router.push('/PrivateTransportLogic/PrivateTransDoneView'); 
   };
 
   return (
@@ -46,7 +46,7 @@ const PTC_OwnOptions = () => {
           style={styles.input}
         >
           <Picker.Item label="Seleccione Modelo..." value="" />
-          <Picker.Item label="DAF XF" value="DAF XF" />
+          <Picker.Item label="DAF XF" value="DAF XF" /> 
           <Picker.Item label="DAF CF" value="DAF CF" />
           <Picker.Item label="Kenworth T680" value="Kenworth T680" />
           <Picker.Item label="Renault T High" value="Renault T High" />

@@ -15,7 +15,7 @@ const PTC_OwnOptions = () => {
         Branch,
         Year,
     });
-    router.push('/PrivateTransportLogic/PrivateTransDoneView'); 
+    router.push('/SuccessAccount'); // Navegar a Success
   };
 
   return (

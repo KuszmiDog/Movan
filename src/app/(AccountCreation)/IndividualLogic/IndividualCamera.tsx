@@ -7,7 +7,7 @@ const Transport = () => {
 
     const handleCreateAccount = () => {
         // Lógica para crear la cuenta
-        router.push('/IndividualLogic/SuccessAccount'); // Navegar a Success
+        router.push('/SuccessAccount'); // Navegar a Success
 
     };
 

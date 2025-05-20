@@ -78,13 +78,11 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: '#565EB3',
-    gap:8
+    gap:10
   },
   title: {
-    bottom: 70,
+    bottom: 30,
     fontSize: 35,
-    textShadowColor: 'black', 
-    textShadowOffset: { width: -1, height: 0 },
     textShadowRadius: 10,
     color: "white",
     fontWeight: "600",
@@ -107,8 +105,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     top: 15,
-    alignSelf: "center", // Centra el botón horizontalmente
-    minWidth: 220, // Asegura un ancho mínimo suficiente
+    alignSelf: "center", 
+    minWidth: 220, 
   },
 
   bottomText:{

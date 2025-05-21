@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 const PrivateTransCameraTake = () => {
   return (
           <SafeAreaView style={styles.background}>
+            <Text style={styles.text}>Toma una foto de tu rostro, sonrie!</Text>
             <CameraComponent></CameraComponent>
           </SafeAreaView>
   )
@@ -45,6 +46,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'center',
         marginBottom: verticalScale(30),
+        top: 120
     },
     button: {
         backgroundColor: '#262E93',

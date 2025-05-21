@@ -1,19 +1,20 @@
-import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
-import { useState } from 'react';
+import { CameraView, CameraType, useCameraPermissions, Camera } from 'expo-camera';
+import { useState, useRef } from 'react';
 import { Button, StyleSheet, Text, Image, TouchableOpacity, View } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import imagePaths from '@/src/constants/imagePaths';
 
 export default function App() {
   const [facing, setFacing] = useState<CameraType>('front');
   const [permission, requestPermission] = useCameraPermissions();
+  const [photoUri, setPhotoUri] = useState<string | null>(null);
+  const cameraRef = useRef<Camera | null>(null);
 
   if (!permission) {
-    // Camera permissions are still loading.
     return <View />;
   }
 
   if (!permission.granted) {
-    // Camera permissions are not granted yet.
     return (
       <View style={styles.container}>
         <Text style={styles.message}>We need your permission to show the camera</Text>
@@ -22,29 +23,61 @@ export default function App() {
     );
   }
 
-  function toggleCameraFacing() {
+  const toggleCameraFacing = () => {
     setFacing(current => (current === 'back' ? 'front' : 'back'));
-    
-  }
+  };
+
+  const takePhoto = async () => {
+    if (cameraRef.current) {
+      const photo = await cameraRef.current.takePictureAsync();
+      setPhotoUri(photo.uri);
+
+      try {
+        await AsyncStorage.setItem('lastPhoto', photo.uri);
+        console.log('Photo saved to AsyncStorage:', photo.uri);
+      } catch (error) {
+        console.error('Error saving photo to AsyncStorage:', error);
+      }
+    }
+  };
 
   return (
     <View style={styles.container}>
-      <CameraView style={styles.camera} facing={facing}> </CameraView>
-      <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
-        <Image
-          source={imagePaths.flip}
-          style={styles.flipbutton}
-        />
-        
-      </TouchableOpacity>
+      <CameraView
+        style={styles.camera}
+        facing={facing}
+        ref={cameraRef}
+      />
+
+      <View style={styles.tabs}>
+        <TouchableOpacity style={styles.button} onPress={() => {}}>
+          <Image source={imagePaths.cameraflash} style={styles.flipbutton} />
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.button} onPress={takePhoto}>
+          <Image source={imagePaths.takephoto} style={styles.flipbutton} />
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
+          <Image source={imagePaths.flip} style={styles.flipbutton} />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
+    
+  },
+  tabs:{
+    flexDirection: 'row',
+    alignSelf: 'center',
+    gap: 40,
+    top: 20
   },
   message: {
     textAlign: 'center',
@@ -56,12 +89,16 @@ const styles = StyleSheet.create({
   },
   camera: {
     flex: 1,
-    borderRadius: 30,
+    borderRadius: 300,
     borderColor: 'white',
     borderWidth: 2,
-    marginTop: 20,
-    marginBottom: 120,
-    marginHorizontal: 20 
+    marginTop: 120,
+    marginBottom: 100,
+    marginHorizontal: 8,
+    width: 368,
+    borderCurve:"circular"
+
+    
   },
   flipbutton: {
     alignSelf: "center",
@@ -72,7 +109,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     backgroundColor: 'transparent',
-    margin: 40,
+    margin: 50,
   },
   text: {
     fontSize: 10,

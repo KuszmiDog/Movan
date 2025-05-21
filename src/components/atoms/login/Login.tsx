@@ -6,40 +6,40 @@ import HyperLink from '../HyperLink/Hyperlink';
 
 const LoginForm = ({ onLogin }) => {
 
-  const [username, setUsername] = useState('');
+  const [mail, setMail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   const handleLogin = useCallback(() => {
-    if (!username || !password) {
+    if (!mail || !password) {
       setError('Por favor, completa todos los campos.');
       return;
     }
 
     // Login Hardcode
     if (onLogin) {
-      onLogin({ username, password });
+      onLogin({ mail, password });
     } else {
-      Alert.alert('Login', `Usuario: ${username}`);
+      Alert.alert('Login', `Usuario: ${mail}`);
     }
 
     setError('');
-  }, [username, password, onLogin]);
+  }, [mail, password, onLogin]);
 
   return (
     
     <View style={styles.container}>
       <Text style={styles.title}>Ingresa tu cuenta</Text>
 
-      <Text style={styles.formtext}>Nombre de Usuario </Text>
+      <Text style={styles.formtext}>Ingresa Correo electronico </Text>
       <TextInput
-        placeholder="Nombre de usuario"
+        placeholder="Correo electronico"
         style={styles.input}
-        value={username}
-        onChangeText={setUsername}
+        value={mail}
+        onChangeText={setMail}
         autoCapitalize="none"
       />
-      <Text style={styles.formtext}>Nombre de Usuario </Text>
+      <Text style={styles.formtext}>Ingresa Contraseña </Text>
       <TextInput  
         placeholder="Contraseña"
         style={styles.input}

@@ -1,19 +1,22 @@
+import { router } from 'expo-router';
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { moderateScale, verticalScale } from 'react-native-size-matters';
 
 const MovanMenu = () => {
+
   const handleNavigation = (screen) => {
     console.log(`Navegando a: ${screen}`);
-    // Aquí puedes agregar la lógica de navegación, por ejemplo:
-    // router.push(screen);
+    router.push(screen)
   };
+
+  
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>¡Bienvenido al Menú!</Text>
       <View style={styles.menuContainer}>
-        <TouchableOpacity style={styles.menuButton} onPress={() => handleNavigation('/Profile')}>
+        <TouchableOpacity style={styles.menuButton} onPress={() => handleNavigation('/AccountScreen')}>
           <Text style={styles.menuButtonText}>Perfil</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.menuButton} onPress={() => handleNavigation('/Settings')}>

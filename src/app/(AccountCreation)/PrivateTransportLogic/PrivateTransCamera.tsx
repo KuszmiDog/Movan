@@ -3,7 +3,6 @@ import { router } from 'expo-router';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { moderateScale, verticalScale } from 'react-native-size-matters';
-import CameraComponent from '@/src/components/atoms/inputs/CameraComponent';
 
 const PrivateTransCamera = () => {
 
@@ -21,7 +20,6 @@ const PrivateTransCamera = () => {
                     la creacion de la cuenta
                 </Text>
                 <View>
-
                     <Image
                         source={imagePaths.iconCamera}
                         style={styles.iconCamera}

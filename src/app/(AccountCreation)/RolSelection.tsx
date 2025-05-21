@@ -22,9 +22,9 @@ const RolSelection = () => {
     if (selectedRole === 'private') {
       router.push('/(AccountCreation)/PrivateTransportLogic/PrivateTransID');
       } else if (selectedRole === 'transport') {
-      router.push('/(AccountCreation)/TransportLogic/Transport');
+      router.push('/(AccountCreation)/TransportLogic/TransportID');
     } else if (selectedRole === 'individual') {
-      router.push('/(AccountCreation)/IndividualLogic/Individual');
+      router.push('/(AccountCreation)/IndividualLogic/IndividualID');
       }
   };
 

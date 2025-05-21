@@ -3,44 +3,33 @@ import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import imagePath from "@/src/constants/imagePaths"
 import { moderateScale } from "react-native-size-matters"
-import BottomComponents from '@/src/components/atoms/BottomComponents'
+import { useRouter } from 'expo-router'
 
 
 const movan_introduction = () => {
-
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       setIsLoading(true);
+      router.push('/(auth)/TermsAndConPage');
     }, 3000);
-  })
-  
-  return (
-    
-    <SafeAreaView style={styles.container} >
-        <View style={styles.movanlogo}>
-            <Image source={imagePath.iconMovan} style={styles.logoimage}/>
-            <Text style={styles.textLogo}>Transportá. Conectá. Mové.</Text>
-        </View>
-        <View style={styles.mApacheLogo}>
-          {isLoading ? (
-            <>
-              <BottomComponents tittle="Siguiente" navigateTo='TermsAndConPage'></BottomComponents>
-              <Image source={imagePath.iconMApache} style={styles.mApacheLogoImage}/>
-              <Text style={styles.mApacheFont}>from mApache</Text> 
-            </>
-          ) : 
-          (
-            <>
-              <ActivityIndicator size={moderateScale(48)} color={"white"}/>
-              <Text style={styles.mApacheFont}>Loading...</Text>
-            </>
-          )}
+    return () => clearTimeout(timer);
+  }, [router]);
 
-          
-        </View>
-        
+  return (
+    <SafeAreaView style={styles.container} >
+      <View style={styles.movanlogo}>
+        <Image source={imagePath.iconMovan} style={styles.logoimage}/>
+        <Text style={styles.textLogo}>Transportá. Conectá. Mové.</Text>
+      </View>
+      <View style={styles.mApacheLogo}>
+        <ActivityIndicator size={moderateScale(48)} color={"white"}/>
+        <Text style={styles.mApacheFont}>Loading...</Text>
+        <Image source={imagePath.iconMApache} style={styles.mApacheLogoImage}/>
+        <Text style={styles.mApacheFont}>from mApache</Text>
+      </View>
     </SafeAreaView>
   )
 }

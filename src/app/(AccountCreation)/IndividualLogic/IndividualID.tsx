@@ -15,7 +15,7 @@ const TransportID = () => {
       selectedDocumentType,
       documentNumber,
     });
-    router.push('/TransportLogic/TransportPhoneNumber');
+    router.push('/IndividualLogic/IndividualPhone'); // Navegar a la siguiente pantalla
   };
 
   return (
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     borderRadius: moderateScale(10),
     padding: verticalScale(10),
     marginBottom: verticalScale(15),
-    fontSize: 16,
+    fontSize: 16
   },
   button: {
     backgroundColor: '#262E93',
@@ -125,6 +125,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   footer: {
+    bottom: 14,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: verticalScale(20),

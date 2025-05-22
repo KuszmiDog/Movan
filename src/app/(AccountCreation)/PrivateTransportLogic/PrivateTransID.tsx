@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-nativ
 import { Picker } from '@react-native-picker/picker';
 import { moderateScale, verticalScale } from 'react-native-size-matters';
 
-const TransportID = () => {
+const PrivateTransID = () => {
   const [selectedCountry, setSelectedCountry] = useState('');
   const [selectedDocumentType, setSelectedDocumentType] = useState('');
   const [documentNumber, setDocumentNumber] = useState('');
@@ -15,7 +15,7 @@ const TransportID = () => {
       selectedDocumentType,
       documentNumber,
     });
-    router.push('/TransportLogic/TransportPhoneNumber');
+    router.push('/PrivateTransportLogic/PrivateTransCamera'); 
   };
 
   return (
@@ -49,7 +49,6 @@ const TransportID = () => {
           <Picker.Item label="DNI" value="DNI" />
           <Picker.Item label="Pasaporte" value="Pasaporte" />
           <Picker.Item label="Licencia de conducir" value="Licencia" />
-          {/* Agrega más tipos de documentos aquí */}
         </Picker>
 
         <Text style={styles.label}>Ingrese su número de documento</Text>
@@ -108,7 +107,7 @@ const styles = StyleSheet.create({
     borderRadius: moderateScale(10),
     padding: verticalScale(10),
     marginBottom: verticalScale(15),
-    fontSize: 16,
+    fontSize: 16
   },
   button: {
     backgroundColor: '#262E93',
@@ -125,6 +124,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   footer: {
+    bottom: 14,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: verticalScale(20),
@@ -136,4 +136,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TransportID;
+export default PrivateTransID;

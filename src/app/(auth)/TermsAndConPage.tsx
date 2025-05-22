@@ -69,14 +69,12 @@ const styles = StyleSheet.create({
   },
 
   mApacheLogoImage: {
-    width: 65,
+    width: 55,
     height: 40,
-    
+    top: 8
   },  
 
   mApacheFont: {
-    textShadowColor: 'black', 
-    textShadowOffset: { width: -1, height: 0 },
     textShadowRadius: 10,
     fontSize: 15,
     color: "white",

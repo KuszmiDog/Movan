@@ -16,7 +16,7 @@ const TransportID = () => {
             truckNumber,
             directionFleete,
         });
-        router.push('/(AccountCreation)/RolSelection'); // Navegar a la siguiente pantalla
+        router.push('/SuccessAccount'); // Navegar a la siguiente pantalla
     };
 
     return (

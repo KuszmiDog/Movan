@@ -1,15 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { moderateScale, verticalScale } from 'react-native-size-matters';
-import imagePath from '@/src/constants/imagePaths';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import BottomComponents from '@/src/components/atoms/BottomComponents';
 import { useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 const CreateAccount = () => {
-  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter(); // Hook para manejar la navegación
@@ -17,22 +14,15 @@ const CreateAccount = () => {
 
   const handleCreateAccount = () => {
     // Lógica para crear la cuenta
-    console.log('Crear cuenta con:', { username, email, password });
+    console.log('Crear cuenta con:', { email, password });
     router.push('/(AccountCreation)/RolSelection'); // Navegar a RolSelection
 
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Creación de Cuenta</Text>
-
-      <Text style={styles.label}>Crea Tu nombre de usuario</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Nombre de usuario"
-        value={username}
-        onChangeText={setUsername}
-      />
+    <SafeAreaView style={styles.background}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Creación de Cuenta</Text>
 
       <Text style={styles.label}>Ingresa un Correo Electrónico</Text>
       <TextInput
@@ -58,18 +48,28 @@ const CreateAccount = () => {
 
       <Text style={styles.orText}>O crea tu cuenta con</Text>
 
-      <View style={styles.iconContainer}>
-      <MaterialCommunityIcons name="facebook" size={50} color="white" />
-      <MaterialCommunityIcons name="google" size={50} color="#DB4437" />
+      <View style={styles.accountcreation}>
+        <View style={styles.iconContainer}>
+          <MaterialCommunityIcons name="facebook" size={50} color="white" />
+          <MaterialCommunityIcons name="google" size={50} color="white" />
+          <MaterialCommunityIcons name="instagram" size={50} color="white" />
+        </View>
       </View>
-
-      <Text style={styles.footerText}>from mApache</Text>
-    </View>
+        <View style={styles.footer}>
+            <Text style={styles.footerText}>from mApache</Text>
+          </View>
+      </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    backgroundColor: '#565EB3' 
+  },
   container: {
+    top: 100,
     flex: 1,
     backgroundColor: '#565EB3',
     alignItems: 'center',
@@ -83,7 +83,9 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     flexDirection: 'row',
-    gap: 20,
+    gap: 55,
+    alignItems: "center"
+
   },
   label: {
     fontSize: 16,
@@ -118,6 +120,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     marginVertical: verticalScale(15),
+    top: 150
   },
   socialContainer: {
     flexDirection: 'row',
@@ -128,11 +131,21 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
   },
+  footer: {
+    bottom: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: verticalScale(190),
+  },
   footerText: {
     color: 'white',
     fontSize: 14,
     textAlign: 'center',
   },
+  accountcreation:{
+    top:150
+  }
+  
 });
 
 export default CreateAccount;

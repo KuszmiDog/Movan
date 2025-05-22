@@ -3,50 +3,32 @@ import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import imagePath from "@/src/constants/imagePaths"
 import { moderateScale } from "react-native-size-matters"
-import LottieView from 'lottie-react-native';
-import { useRouter } from 'expo-router';
+import { useRouter } from 'expo-router'
+
 
 const movan_introduction = () => {
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(true);
       router.push('/(auth)/TermsAndConPage');
     }, 3000);
-
     return () => clearTimeout(timer);
   }, [router]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} >
       <View style={styles.movanlogo}>
-        <Image source={imagePath.iconMovan} style={styles.logoimage} />
+        <Image source={imagePath.iconMovan} style={styles.logoimage}/>
         <Text style={styles.textLogo}>Transportá. Conectá. Mové.</Text>
       </View>
-      <View style={styles.contentContainer}>
-        <View style={styles.animationContainer}>
-          <LottieView
-            source={require('@/src/assets/animations/Movan.json')}
-            autoPlay
-            loop
-            style={{ width: 200, height: 200 }}
-          />
-        </View>
-      </View>
       <View style={styles.mApacheLogo}>
-        {isLoading ? (
-          <>
-            <Image source={imagePath.iconMApache} style={styles.mApacheLogoImage} />
-            <Text style={styles.mApacheFont}>from mApache</Text>
-          </>
-        ) : (
-          <>
-            <ActivityIndicator size={moderateScale(48)} color={"white"} />
-            <Text style={styles.mApacheFont}>Loading...</Text>
-          </>
-        )}
+        <ActivityIndicator size={moderateScale(48)} color={"white"}/>
+        <Text style={styles.mApacheFont}>Loading...</Text>
+        <Image source={imagePath.iconMApache} style={styles.mApacheLogoImage}/>
+        <Text style={styles.mApacheFont}>from mApache</Text>
       </View>
     </SafeAreaView>
   );
@@ -95,18 +77,16 @@ const styles = StyleSheet.create({
   },
 
   mApacheLogoImage: {
-    width: 65,
+    width: 55,
     height: 40,
-  },
+    top: 8
+  },  
 
   mApacheFont: {
     fontSize: 15,
     color: "white",
     fontWeight: "500",
     bottom: 20,
-
-    textShadowColor: 'black',
-    textShadowOffset: { width: -1, height: 0 },
     textShadowRadius: 10,
   },
 

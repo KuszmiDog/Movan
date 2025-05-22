@@ -4,28 +4,26 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { verticalScale } from 'react-native-size-matters';
 
-const RolSelection = () => {
-  const [selectedRole, setSelectedRole] = useState(null);
+
+const PrivateTransChoose = () => {
+  const [selectedOwner, setSelectedOwner] = useState(null);
   const [infoVisible, setInfoVisible] = useState(false);
   const [infoText, setInfoText] = useState('');
   const router = useRouter();
 
-  const roles = [
-    { label: 'Transportista Privado', value: 'private', description: 'Un transportista privado realiza envíos de manera independiente.' },
-    { label: 'Transporte', value: 'transport', description: 'Un transporte es una empresa que ofrece servicios de envío.' },
-    { label: 'Particular', value: 'individual', description: 'Un particular utiliza la aplicación para envíos personales.' },
+  const owners = [
+    { label: 'Vehiculo Propio', value: 'own_truck', description: 'Un Vehiculo propio, adquirido por el transportista privado de manera completa, NO perteneciente a una flota de camiones.' },
+    { label: 'Vehiculo de Flota', value: 'ship_truck', description: 'Un Vehiculo de flota se trata de uno perteneciente a un Transporte, el cual solo es utilizado por usted pero no es de su propiedad.' },
   ];
 
   const handleNext = () => {
-    console.log('Rol seleccionado:', selectedRole);
+    console.log('Rol seleccionado:', selectedOwner);
 
-    if (selectedRole === 'private') {
-      router.push('/(AccountCreation)/PrivateTransportLogic/PrivateTransID');
-      } else if (selectedRole === 'transport') {
-      router.push('/(AccountCreation)/TransportLogic/TransportID');
-    } else if (selectedRole === 'individual') {
-      router.push('/(AccountCreation)/IndividualLogic/IndividualID');
-      }
+    if (selectedOwner === 'own_truck') {
+      router.push('/(AccountCreation)/PrivateTransportLogic/PTC_OwnOptions');
+      } else if (selectedOwner === 'ship_truck') {
+      router.push('/(AccountCreation)/PrivateTransportLogic/PTC_ShipTruck');
+    }
   };
 
   const showInfo = (description) => {
@@ -35,20 +33,20 @@ const RolSelection = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>¿Qué Rol te gustaría adoptar en la aplicación?</Text>
+      <Text style={styles.title}>A que propietario corresponde el vehiculo que usaras?</Text>
 
       <View style={styles.optionsContainer}>
-        {roles.map((role) => (
-          <View key={role.value} style={styles.option}>
-            <TouchableOpacity onPress={() => setSelectedRole(role.value)} style={styles.roleContainer}>
+        {owners.map((owner) => (
+          <View key={owner.value} style={styles.option}>
+            <TouchableOpacity onPress={() => setSelectedOwner(owner.value)} style={styles.roleContainer}>
               <MaterialCommunityIcons
-                name={selectedRole === role.value ? 'radiobox-marked' : 'radiobox-blank'}
+                name={selectedOwner === owner.value ? 'radiobox-marked' : 'radiobox-blank'}
                 size={24}
                 color="white"
               />
-              <Text style={styles.optionText}>{role.label}</Text>
+              <Text style={styles.optionText}>{owner.label}</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => showInfo(role.description)}>
+            <TouchableOpacity onPress={() => showInfo(owner.description)}>
               <MaterialCommunityIcons name="information-outline" size={24} color="white" />
             </TouchableOpacity>
           </View>
@@ -56,17 +54,17 @@ const RolSelection = () => {
       </View>
 
       <TouchableOpacity
-        style={[styles.button, !selectedRole && styles.buttonDisabled]}
+        style={[styles.button, !selectedOwner && styles.buttonDisabled]}
         onPress={handleNext}
-        disabled={!selectedRole}
+        disabled={!selectedOwner}
       >
         <Text style={styles.buttonText}>Siguiente</Text>
       </TouchableOpacity>
 
       <View style={styles.footer}>
-        <Text style={styles.footerText}>from mApache</Text>
+          <Text style={styles.footerText}>from mApache</Text>
       </View>
-      {/* Modal para mostrar información */}
+
       <Modal
         visible={infoVisible}
         transparent={true}
@@ -142,6 +140,17 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
+  footer: {
+    bottom: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+    top: 250,
+        },
+  footerText: {
+    color: 'white',
+    fontSize: 14,
+    textAlign: 'center',
+        },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -171,17 +180,6 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
   },
-  footer: {
-    bottom: 14,
-    justifyContent: 'center',
-    alignItems: 'center',
-    top: 230,
-  },
-  footerText: {
-    color: 'white',
-    fontSize: 14,
-    textAlign: 'center',
-  }
 });
 
-export default RolSelection;
+export default PrivateTransChoose;

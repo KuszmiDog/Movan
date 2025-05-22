@@ -1,23 +1,24 @@
 import imagePaths from '@/src/constants/imagePaths';
 import { router } from 'expo-router';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { moderateScale, verticalScale } from 'react-native-size-matters';
 
-const Transport = () => {
+const PrivateTransCamera = () => {
 
     const handleCreateAccount = () => {
-        // Lógica para crear la cuenta
-        router.push('/TransportLogic/PrivateTransCamera'); // Navegar a RolSelection
+        router.push('/TransportLogic/PrivateTransCameraTake'); 
 
     };
-
-
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.background}>
+            <View style={styles.container}>
             <View style={styles.body}>
-                <Text style={styles.text}>¡Agregue una foto de su jeta para {'\n'} confirmar su identidad!
+                <Text style={styles.text}>¡Agregue una foto de su rostro para confirmar su identidad!
                 </Text>
-                <Text style={styles.label}>Ingresa tu cod de área y tu número de teléfono</Text>
+                <Text style={styles.label}>Esta foto estara disponible para los demas usuarios una vez completada
+                    la creacion de la cuenta
+                </Text>
                 <View>
                     <Image
                         source={imagePaths.iconCamera}
@@ -28,16 +29,25 @@ const Transport = () => {
             </View>
             <View style={styles.footer}>
                 <TouchableOpacity style={styles.button} onPress={handleCreateAccount}>
-                    <Text style={styles.buttonText}>Siguiente</Text>
+                    <Text style={styles.buttonText}>Tomar Foto</Text>
                 </TouchableOpacity>
                 <Text style={styles.footerText}>from mApache</Text>
             </View>
         </View>
+        </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
+
+    background:{
+        flex: 1,
+        backgroundColor: '#565EB3'
+    },
+
     container: {
+        top: 10,
+        gap: 40,
         flex: 1,
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -72,7 +82,7 @@ const styles = StyleSheet.create({
     },
     text: {
         color: 'white',
-        fontSize: 26,
+        fontSize: 20,
         textShadowColor: 'black',
         textShadowOffset: { width: 3, height: 4 },
         fontWeight: 'bold',
@@ -106,4 +116,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default Transport;
+export default PrivateTransCamera;

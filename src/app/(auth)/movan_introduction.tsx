@@ -67,8 +67,9 @@ const styles = StyleSheet.create({
   },
 
   mApacheLogoImage: {
-    width: 65,
+    width: 55,
     height: 40,
+    top: 8
   },  
 
   mApacheFont: {

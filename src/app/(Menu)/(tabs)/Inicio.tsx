@@ -10,8 +10,6 @@ const MovanMenu = () => {
     router.push(screen)
   };
 
-  
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>¡Bienvenido al Menú!</Text>

@@ -7,7 +7,7 @@ const SuccessAccount = () => {
   const router = useRouter();
 
   const handleGoToMenu = () => {
-    router.push('/(Menu)/MovanMenu'); // Navegar al menú principal
+    router.push('/(Menu)/(tabs)/Inicio'); // Navegar al menú principal
   };
 
   return (

@@ -3,6 +3,7 @@ import { useState, useRef } from 'react';
 import { Button, StyleSheet, Text, Image, TouchableOpacity, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import imagePaths from '@/src/constants/imagePaths';
+import { router } from 'expo-router';
 
 export default function App() {
   const [facing, setFacing] = useState<CameraType>('front');
@@ -35,6 +36,11 @@ export default function App() {
       try {
         await AsyncStorage.setItem('lastPhoto', photo.uri);
         console.log('Photo saved to AsyncStorage:', photo.uri);
+        
+        setTimeout(() => {
+          router.push('/PrivateTransportLogic/PTC_ConfirmPhoto');
+        }, 100);
+        
       } catch (error) {
         console.error('Error saving photo to AsyncStorage:', error);
       }

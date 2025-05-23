@@ -1,16 +1,16 @@
 import { View, Text, StyleSheet } from 'react-native'
 import React from 'react'
-import CameraComponent from '@/src/components/atoms/inputs/CameraComponent'
 import { moderateScale, verticalScale } from 'react-native-size-matters'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { router } from 'expo-router'
+import CameraComponentTL from '@/src/app/(AccountCreation)/TransportLogic/CameraComponentTL'
 
 const PrivateTransCameraTake = () => {
     
   return (
           <SafeAreaView style={styles.background}>
             <Text style={styles.text}>Toma una foto de tu rostro, sonrie!</Text>
-            <CameraComponent></CameraComponent>
+            <CameraComponentTL></CameraComponentTL>
           </SafeAreaView>
   )
 }

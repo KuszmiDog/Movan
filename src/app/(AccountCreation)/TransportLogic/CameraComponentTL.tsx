@@ -38,7 +38,7 @@ export default function App() {
         console.log('Photo saved to AsyncStorage:', photo.uri);
         
         setTimeout(() => {
-          router.push('/PrivateTransportLogic/PTC_ConfirmPhoto');
+          router.push('/TransportLogic/PTC_ConfirmPhoto');
         }, 100);
         
       } catch (error) {

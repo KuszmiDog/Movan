@@ -9,7 +9,7 @@ const Transport = () => {
     const handleCreateAccount = () => {
         // Lógica para crear la cuenta
         console.log('Crear cuenta con: ', { phoneNumber });
-        router.push('/TransportLogic/TransportCamera'); // Navegar a RolSelection
+        router.push('/TransportLogic/PrivateTransCamera'); // Navegar a RolSelection
 
     };
 

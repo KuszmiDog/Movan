@@ -3,28 +3,31 @@ import { View, Text, TextInput, StyleSheet, Alert, TouchableOpacity } from 'reac
 import { moderateScale, verticalScale } from 'react-native-size-matters';
 import Buttonbase from '../HyperLink/Hyperlink';
 import HyperLink from '../HyperLink/Hyperlink';
+import { router } from 'expo-router';
 
 const LoginForm = ({ onLogin }) => {
-
   const [mail, setMail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   const handleLogin = useCallback(() => {
-    if (!mail || !password) {
+    // Comentamos temporalmente la validación
+    /* if (!mail || !password) {
       setError('Por favor, completa todos los campos.');
       return;
-    }
+    } */
 
-    // Login Hardcode
-    if (onLogin) {
+    // Navegación directa al menú
+    router.push('/(Menu)/(tabs)/Inicio');
+
+    // Mantenemos el código original comentado por si lo necesitas después
+    /* if (onLogin) {
       onLogin({ mail, password });
     } else {
       Alert.alert('Login', `Usuario: ${mail}`);
     }
-
-    setError('');
-  }, [mail, password, onLogin]);
+    setError(''); */
+  }, []);  // Removemos las dependencias ya que no las usamos por ahora
 
   return (
     

@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import imagePaths from '@/src/constants/imagePaths';
 import { moderateScale, verticalScale } from 'react-native-size-matters';
+import { router } from 'expo-router';
 
 export default function AccountScreen() {
   const [photoUri, setPhotoUri] = useState<string | null>(null);
@@ -85,7 +86,10 @@ export default function AccountScreen() {
           </View>
         </View>
 
-        <TouchableOpacity style={styles.editButton}>
+        <TouchableOpacity 
+          style={styles.editButton}
+          onPress={() => router.push('/(Menu)/(Ajustes)/EditProfile')}
+        >
           <MaterialCommunityIcons name="account-edit" size={24} color="white" />
           <Text style={styles.editButtonText}>Editar Perfil</Text>
         </TouchableOpacity>

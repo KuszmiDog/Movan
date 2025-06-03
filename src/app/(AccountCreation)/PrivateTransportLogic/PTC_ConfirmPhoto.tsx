@@ -45,7 +45,7 @@ const PTC_ConfirmPhoto = () => {
 
   return (
     <SafeAreaView style={styles.background}>
-      <LinearGradient colors={['#565EB3', '#00299147']}> </LinearGradient>
+      <LinearGradient colors={['#565EB3', '#00299147']}> </LinearGradient> 
       <View style={styles.container}>
       {photoUri ? (
         <Image source={{ uri: photoUri }} style={styles.image} />

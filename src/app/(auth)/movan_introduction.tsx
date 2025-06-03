@@ -31,23 +31,33 @@ const movan_introduction = () => {
         <Text style={styles.mApacheFont}>from mApache</Text>
       </View>
     </SafeAreaView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
-  container:{
+  container: {
     flex: 1,
     backgroundColor: "#565EB3",
     alignItems: "center",
     justifyContent: "space-between"
   },
 
-  movanlogo:{
+  contentContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  animationContainer: {
+    marginBottom: 100,
+  },
+
+  movanlogo: {
     justifyContent: "center",
     top: 70,
   },
 
-  logoimage:{
+  logoimage: {
     width: 220,
     height: 220,
     left: 8,
@@ -80,7 +90,7 @@ const styles = StyleSheet.create({
     textShadowRadius: 10,
   },
 
-  header:{
+  header: {
     alignItems: "center",
     gap: moderateScale(30)
   }

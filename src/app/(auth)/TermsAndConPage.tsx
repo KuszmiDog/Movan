@@ -4,8 +4,15 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import imagePath from "@/src/constants/imagePaths"
 import { moderateScale } from "react-native-size-matters"
 import TermsAndCon from '@/src/components/atoms/TermsAndCon'
+import { colors } from '@/src/constants/colors'
 
 const TermsAndC = () => {
+
+  const roles = [
+    { label: 'Transportista Privado', value: 'private', description: 'Un transportista privado realiza envíos de manera independiente.' },
+    { label: 'Transporte', value: 'transport', description: 'Un transporte es una empresa que ofrece servicios de envío.' },
+    { label: 'Particular', value: 'individual', description: 'Un particular utiliza la aplicación para envíos personales.' },
+  ];
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -39,7 +46,7 @@ const TermsAndC = () => {
 const styles = StyleSheet.create({
   container:{
     flex: 1,
-    backgroundColor: "#565EB3",
+    backgroundColor: colors.primary,
     alignItems: "center",
     justifyContent: "space-between"
   },
@@ -77,7 +84,7 @@ const styles = StyleSheet.create({
   mApacheFont: {
     textShadowRadius: 10,
     fontSize: 15,
-    color: "white",
+    color: colors.white,
     fontWeight: "500",
     bottom: 20
   },

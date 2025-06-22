@@ -4,6 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import imagePath from "@/src/constants/imagePaths"
 import { moderateScale } from "react-native-size-matters"
 import { useRouter } from 'expo-router'
+import { colors } from '@/src/constants/colors'
+import movan_introduction_styles from '@/src/constants/introduction_styles/movan_introduction_styles'
 
 
 const movan_introduction = () => {
@@ -19,81 +21,19 @@ const movan_introduction = () => {
   }, [router]);
 
   return (
-    <SafeAreaView style={styles.container} >
-      <View style={styles.movanlogo}>
-        <Image source={imagePath.iconMovan} style={styles.logoimage}/>
-        <Text style={styles.textLogo}>Transportá. Conectá. Mové.</Text>
+    <SafeAreaView style={movan_introduction_styles.container} >
+      <View style={movan_introduction_styles.movanlogo}>
+        <Image source={imagePath.iconMovan} style={movan_introduction_styles.logoimage}/>
+        <Text style={movan_introduction_styles.textLogo}>Transportá. Conectá. Mové.</Text>
       </View>
-      <View style={styles.mApacheLogo}>
+      <View style={movan_introduction_styles.mApacheLogo}>
         <ActivityIndicator size={moderateScale(48)} color={"white"}/>
-        <Text style={styles.mApacheFont}>Loading...</Text>
-        <Image source={imagePath.iconMApache} style={styles.mApacheLogoImage}/>
-        <Text style={styles.mApacheFont}>from mApache</Text>
+        <Text style={movan_introduction_styles.mApacheFont}>Loading...</Text>
+        <Image source={imagePath.iconMApache} style={movan_introduction_styles.mApacheLogoImage}/>
+        <Text style={movan_introduction_styles.mApacheFont}>from mApache</Text>
       </View>
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#565EB3",
-    alignItems: "center",
-    justifyContent: "space-between"
-  },
-
-  contentContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  animationContainer: {
-    marginBottom: 100,
-  },
-
-  movanlogo: {
-    justifyContent: "center",
-    top: 70,
-  },
-
-  logoimage: {
-    width: 220,
-    height: 220,
-    left: 8,
-    top: 29
-  },
-
-  textLogo: {
-    fontSize: 20,
-    color: "white",
-    fontWeight: "600"
-  },
-
-  mApacheLogo: {
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 25
-  },
-
-  mApacheLogoImage: {
-    width: 55,
-    height: 40,
-    top: 8
-  },  
-
-  mApacheFont: {
-    fontSize: 15,
-    color: "white",
-    fontWeight: "500",
-    bottom: 20,
-    textShadowRadius: 10,
-  },
-
-  header: {
-    alignItems: "center",
-    gap: moderateScale(30)
-  }
-})
 
 export default movan_introduction

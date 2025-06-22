@@ -10,11 +10,7 @@ const RolSelection = () => {
   const [infoText, setInfoText] = useState('');
   const router = useRouter();
 
-  const roles = [
-    { label: 'Transportista Privado', value: 'private', description: 'Un transportista privado realiza envíos de manera independiente.' },
-    { label: 'Transporte', value: 'transport', description: 'Un transporte es una empresa que ofrece servicios de envío.' },
-    { label: 'Particular', value: 'individual', description: 'Un particular utiliza la aplicación para envíos personales.' },
-  ];
+  
 
   const handleNext = () => {
     console.log('Rol seleccionado:', selectedRole);

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import imagePath from "@/src/constants/imagePaths"
 import { moderateScale } from "react-native-size-matters"
+import { colors } from '@/src/constants/colors'
 
 
 const TermsAndC = () => {
@@ -49,7 +50,7 @@ const TermsAndC = () => {
 const styles = StyleSheet.create({
   container:{
     flex: 1,
-    backgroundColor: "#565EB3",
+    backgroundColor: colors.primary,
     alignItems: "center",
     justifyContent: "space-between"
   },
@@ -68,7 +69,7 @@ const styles = StyleSheet.create({
 
   textLogo: {
     fontSize: 20,
-    color: "white",
+    color: colors.white,
     fontWeight: "600"
   },
 
@@ -86,7 +87,7 @@ const styles = StyleSheet.create({
 
   mApacheFont: {
     fontSize: 15,
-    color: "white",
+    color: colors.white,
     fontWeight: "500",
     bottom: 20
   },
@@ -94,15 +95,7 @@ const styles = StyleSheet.create({
   header:{
     alignItems: "center",
     gap: moderateScale(30)
-  },
-
-  body:{
-
-  },
-
-  footer:{
-
-  },
+  }
 
 })
 

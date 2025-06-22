@@ -15,7 +15,6 @@ const LoginScreen = () => {
   );
 };
 
-
 const style = StyleSheet.create({
     backgroundspace:{
         flex: 1,

@@ -4,6 +4,24 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { verticalScale } from 'react-native-size-matters';
 
+const roles = [
+  {
+    value: 'private',
+    label: 'Transporte Privado',
+    description: 'Para personas que desean registrar y administrar su propio vehículo privado en la aplicación.',
+  },
+  {
+    value: 'transport',
+    label: 'Transporte Público',
+    description: 'Para empresas o conductores que ofrecen servicios de transporte público.',
+  },
+  {
+    value: 'individual',
+    label: 'Individual',
+    description: 'Para usuarios que desean utilizar los servicios de transporte como pasajeros.',
+  },
+];
+
 const RolSelection = () => {
   const [selectedRole, setSelectedRole] = useState(null);
   const [infoVisible, setInfoVisible] = useState(false);
@@ -24,7 +42,7 @@ const RolSelection = () => {
       }
   };
 
-  const showInfo = (description) => {
+  const showInfo = (description: React.SetStateAction<string>) => {
     setInfoText(description);
     setInfoVisible(true);
   };

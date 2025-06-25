@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
         padding: 18,
     },
     buttonlocation:{
-        top: verticalScale(100),
+        top: verticalScale(160),
         width: "100%",
         left: moderateScale(20),
         position: "absolute",

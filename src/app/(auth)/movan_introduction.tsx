@@ -5,7 +5,7 @@ import imagePath from "@/src/constants/imagePaths"
 import { moderateScale } from "react-native-size-matters"
 import { useRouter } from 'expo-router'
 import { colors } from '@/src/constants/colors'
-import movan_introduction_styles from '@/src/constants/introduction_styles/movan_introduction_styles'
+import movan_introduction_styles from '@/src/constants/Movan_introduction_styles/movan_introduction_styles'
 
 
 const movan_introduction = () => {

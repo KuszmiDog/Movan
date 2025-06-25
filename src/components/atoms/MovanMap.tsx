@@ -1,0 +1,152 @@
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import MapView, { Marker } from 'react-native-maps';
+import { moderateScale, verticalScale } from 'react-native-size-matters';
+import styles from '@/src/constants/MovanMap_styles/MovanMap_styles';
+
+const GOOGLE_MAPS_API_KEY = 'AIzaSyDGnUE8DrmabYGlQ4tWPC9cy6tmRA-0538'; 
+
+export const unstable_settings = {
+  headerShown: false,
+};
+
+type SearchResult = {
+  geometry: { location: { lat: number; lng: number } };
+  name: string;
+  vicinity: string; 
+};
+
+type UserLocation = {
+  latitude: number;
+  longitude: number;
+  latitudeDelta: number;
+  longitudeDelta: number;
+};
+
+type ManualMarker = {
+  latitude: number;
+  longitude: number;
+};
+
+const MovanMap = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
+  const [noResults, setNoResults] = React.useState(false);
+  const [manualMarkers, setManualMarkers] = useState<ManualMarker[]>([]);
+
+  const handleSearch = async () => {
+    if (!searchQuery) return;
+
+    try {
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+          searchQuery
+        )}&key=${GOOGLE_MAPS_API_KEY}`
+      );
+      const data = await response.json();
+
+      if (data.results && data.results.length > 0) {
+        const firstResult = data.results[0];
+        const { lat, lng } = firstResult.geometry.location;
+
+        setUserLocation({
+          latitude: lat,
+          longitude: lng,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        });
+
+        setSearchResults([
+          {
+            geometry: { location: { lat, lng } },
+            name: firstResult.formatted_address,
+            vicinity: firstResult.formatted_address,
+          },
+        ]);
+        setNoResults(false);
+      } else {
+        setSearchResults([]);
+        setNoResults(true);
+      }
+    } catch (error) {
+      console.error('Error en la búsqueda:', error);
+      setNoResults(true);
+    }
+  };
+
+  // Maneja el toque en el mapa para agregar un marcador
+  const handleMapPress = (event: any) => {
+    const { latitude, longitude } = event.nativeEvent.coordinate;
+    setManualMarkers([...manualMarkers, { latitude, longitude }]);
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Buscar particulares en ubicación determinada</Text>
+      <View style={styles.menuContainer}>
+        <MapView
+          style={{ width: '100%', height: verticalScale(350), borderRadius: moderateScale(10), marginBottom: verticalScale(20) }}
+          showsUserLocation
+          followsUserLocation
+          initialRegion={{
+            latitude: 37.78825,
+            longitude: -122.4324,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          }}
+          {...(userLocation ? { region: userLocation } : {})}
+          onPress={handleMapPress}
+        >
+          {searchResults.map((result, idx) => (
+            <Marker
+              key={`search-${idx}`}
+              coordinate={{
+                latitude: result.geometry.location.lat,
+                longitude: result.geometry.location.lng,
+              }}
+              title={result.name}
+              description={result.vicinity}
+            />
+          ))}
+          {manualMarkers.map((marker, idx) => (
+            <Marker
+              key={`manual-${idx}`}
+              coordinate={{
+                latitude: marker.latitude,
+                longitude: marker.longitude,
+              }}
+              pinColor="red"
+              title="Marcador manual"
+            />
+          ))}
+        </MapView>
+        <TextInput
+          style={{
+            backgroundColor: 'white',
+            borderRadius: 8,
+            padding: 10,
+            width: '100%',
+            marginBottom: verticalScale(10),
+          }}
+          placeholder="Buscar particulares en ubicación determinada"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          onSubmitEditing={handleSearch}
+          returnKeyType="search"
+        />
+        <TouchableOpacity style={styles.menuButton} onPress={handleSearch}>
+          <Text style={styles.menuButtonText}>Buscar</Text>
+        </TouchableOpacity>
+        {noResults && (
+          <Text style={{ color: 'white', marginTop: 10 }}>
+            No se encontraron resultados para tu búsqueda.
+          </Text>
+        )}
+      </View>
+    </View>
+  );
+};
+
+
+export default MovanMap;

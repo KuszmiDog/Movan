@@ -11,11 +11,6 @@ const roles = [
     description: 'Para personas que desean registrar y administrar su propio vehículo privado en la aplicación.',
   },
   {
-    value: 'transport',
-    label: 'Transporte Público',
-    description: 'Para empresas o conductores que ofrecen servicios de transporte público.',
-  },
-  {
     value: 'individual',
     label: 'Individual',
     description: 'Para usuarios que desean utilizar los servicios de transporte como pasajeros.',
@@ -35,9 +30,7 @@ const RolSelection = () => {
 
     if (selectedRole === 'private') {
       router.push('/(AccountCreation)/PrivateTransportLogic/PrivateTransID');
-      } else if (selectedRole === 'transport') {
-      router.push('/(AccountCreation)/TransportLogic/TransportID');
-    } else if (selectedRole === 'individual') {
+      } else if (selectedRole === 'individual') {
       router.push('/(AccountCreation)/IndividualLogic/IndividualID');
       }
   };

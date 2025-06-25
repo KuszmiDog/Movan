@@ -6,13 +6,13 @@ import { verticalScale } from 'react-native-size-matters';
 
 const roles = [
   {
-    value: 'private',
-    label: 'Transporte Privado',
+    value: 'Private',
+    label: 'Transportista Privado',
     description: 'Para personas que desean registrar y administrar su propio vehículo privado en la aplicación.',
   },
   {
-    value: 'individual',
-    label: 'Individual',
+    value: 'Particular',
+    label: 'Particular',
     description: 'Para usuarios que desean utilizar los servicios de transporte como pasajeros.',
   },
 ];
@@ -23,14 +23,12 @@ const RolSelection = () => {
   const [infoText, setInfoText] = useState('');
   const router = useRouter();
 
-  
-
   const handleNext = () => {
     console.log('Rol seleccionado:', selectedRole);
 
-    if (selectedRole === 'private') {
+    if (selectedRole === 'Private') {
       router.push('/(AccountCreation)/PrivateTransportLogic/PrivateTransID');
-      } else if (selectedRole === 'individual') {
+      } else if (selectedRole === 'Particular') {
       router.push('/(AccountCreation)/IndividualLogic/IndividualID');
       }
   };

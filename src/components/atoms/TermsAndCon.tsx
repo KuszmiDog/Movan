@@ -12,8 +12,6 @@ const TermsAndCon = () => {
     const [selectedRole, setSelectedRole] = useState(null);
     const [infoVisible, setInfoVisible] = useState(false);
 
-    
-
     return (
         <View style={styles.container}>
             
@@ -88,9 +86,7 @@ const styles = StyleSheet.create({
         position: 'relative',
         top: 0,
         right: 0,
-        padding: 6,
-
-        
+        padding: 6        
     },
     modalOverlay: {
         flex: 1,

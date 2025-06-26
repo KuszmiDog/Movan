@@ -1,14 +1,30 @@
 import React, { useState } from 'react';
+<<<<<<< HEAD
+import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import styles from '@/src/constants/CreateAccount_styles/CreateAccount_styles';
+=======
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, ActivityIndicator } from 'react-native';
 import { moderateScale, verticalScale } from 'react-native-size-matters';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { UserService } from '../../utils/UserService';
 
+>>>>>>> refs/remotes/origin/main
 
 const CreateAccount = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+<<<<<<< HEAD
+  const router = useRouter(); 
+
+  const handleCreateAccount = () => {
+    
+    console.log('Crear cuenta con:', { email, password });
+    router.push('/(AccountCreation)/RolSelection'); 
+=======
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter(); // Hook para manejar la navegación
@@ -32,6 +48,7 @@ const CreateAccount = () => {
   };
 
   const passwordStrength = getPasswordStrength(password);
+>>>>>>> refs/remotes/origin/main
 
 
   const handleCreateAccount = async () => {
@@ -147,6 +164,8 @@ const CreateAccount = () => {
   );
 };
 
+<<<<<<< HEAD
+=======
 const styles = StyleSheet.create({
   background: {
     flex: 1,
@@ -242,4 +261,5 @@ const styles = StyleSheet.create({
   
 });
 
+>>>>>>> refs/remotes/origin/main
 export default CreateAccount;

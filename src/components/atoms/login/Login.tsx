@@ -1,33 +1,57 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, TextInput, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Alert, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { moderateScale, verticalScale } from 'react-native-size-matters';
 import Buttonbase from '../HyperLink/Hyperlink';
 import HyperLink from '../HyperLink/Hyperlink';
 import { router } from 'expo-router';
+import { UserService } from '../../../utils/UserService';
 
-const LoginForm = ({ onLogin }) => {
+const LoginForm = ({ onLogin }: { onLogin?: (credentials: { mail: string; password: string }) => void }) => {
   const [mail, setMail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = useCallback(() => {
-    // Comentamos temporalmente la validación
-    /* if (!mail || !password) {
+  const handleLogin = useCallback(async () => {
+    if (isLoading) return;
+
+    // Validaciones básicas
+    if (!mail || !password) {
       setError('Por favor, completa todos los campos.');
       return;
-    } */
-
-    // Navegación directa al menú
-    router.push('/(Menu)/(tabs)/Inicio');
-
-    // Mantenemos el código original comentado por si lo necesitas después
-    /* if (onLogin) {
-      onLogin({ mail, password });
-    } else {
-      Alert.alert('Login', `Usuario: ${mail}`);
     }
-    setError(''); */
-  }, []);  // Removemos las dependencias ya que no las usamos por ahora
+
+    setIsLoading(true);
+    setError('');
+
+    try {
+      // Intentar hacer login usando AsyncStorage
+      const result = await UserService.loginUser(mail, password);
+      
+      if (result.success) {
+        Alert.alert(
+          'Éxito',
+          'Inicio de sesión exitoso',
+          [
+            {
+              text: 'Continuar',
+              onPress: () => {
+                console.log('Usuario logueado:', result.user);
+                router.push('/(Menu)/(tabs)/Inicio');
+              }
+            }
+          ]
+        );
+      } else {
+        setError(result.message);
+      }
+    } catch (error) {
+      console.error('Error en login:', error);
+      setError('Ocurrió un error inesperado. Intenta nuevamente.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [mail, password, isLoading]);
 
   return (
     
@@ -53,8 +77,16 @@ const LoginForm = ({ onLogin }) => {
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
-      <TouchableOpacity style={styles.EnterButton} onPress={handleLogin}>
-        <Text style={styles.bottomText}>Siguiente</Text>
+      <TouchableOpacity 
+        style={[styles.EnterButton, isLoading && styles.EnterButtonDisabled]} 
+        onPress={handleLogin}
+        disabled={isLoading}
+      >
+        {isLoading ? (
+          <ActivityIndicator color="white" size="small" />
+        ) : (
+          <Text style={styles.bottomText}>Siguiente</Text>
+        )}
       </TouchableOpacity>
 
       <View style={styles.ContainerTextBelow}>
@@ -110,6 +142,11 @@ const styles = StyleSheet.create({
     top: 15,
     alignSelf: "center", 
     minWidth: 220, 
+  },
+
+  EnterButtonDisabled: {
+    backgroundColor: '#8A8FB0',
+    opacity: 0.7,
   },
 
   bottomText:{

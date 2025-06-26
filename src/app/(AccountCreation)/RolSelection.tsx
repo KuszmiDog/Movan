@@ -23,7 +23,7 @@ const RolSelection = () => {
   const [infoText, setInfoText] = useState('');
   const router = useRouter();
 
-  const handleNext = () => {
+  const handleNext = () => {2
     console.log('Rol seleccionado:', selectedRole);
 
     if (selectedRole === 'Private') {

@@ -71,6 +71,9 @@ export class UserService {
         password, // En producción, deberías hashear la contraseña
         createdAt: new Date().toISOString(),
       };
+      //OBTENER MAIL
+      await AsyncStorage.setItem('mail', email.toLowerCase());
+      
 
       // Agregar el nuevo usuario a la lista
       users.push(newUser);
@@ -95,6 +98,8 @@ export class UserService {
       
       if (user) {
         await AsyncStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+        // Guardar el mail también al iniciar sesión
+        await AsyncStorage.setItem('mail', user.email);
         return { success: true, message: 'Inicio de sesión exitoso', user };
       } else {
         return { success: false, message: 'Email o contraseña incorrectos' };

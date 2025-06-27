@@ -10,10 +10,34 @@ import { router } from 'expo-router';
 
 export default function AccountScreen() {
   const [photoUri, setPhotoUri] = useState<string | null>(null);
+  const [userMail, setUserMail] = useState<string | null>(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      const loadUserData = async () => {
+        try {
+          // Intenta obtener el usuario actual guardado
+          const userData = await AsyncStorage.getItem('@movan_current_user');
+          if (userData) {
+            const user = JSON.parse(userData);
+            setUserMail(user.email);
+          } else {
+            // Si no hay usuario actual, intenta obtener el mail suelto
+            const mail = await AsyncStorage.getItem('mail');
+            setUserMail(mail);
+          }
+        } catch (error) {
+          setUserMail(null);
+        }
+      };
+      loadUserData();
+    }, [])
+  );
+
   // Datos de ejemplo del usuario
   const userInfo = {
     name: "Juan Pérez",
-    email: "juan.perez@email.com",
+    email: userMail || "error",
     role: "Transportista Privado",
     phone: "+52 123 456 7890",
     joinDate: "Enero 2024",

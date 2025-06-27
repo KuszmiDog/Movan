@@ -1,18 +1,39 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import styles from '@/src/constants/CreateAccount_styles/CreateAccount_styles';
-import { UserService } from '@/src/utils/UserService';
+import { UserService } from '../../utils/UserService';
+import styles from '@/src/constants/CreateAccount_styles/CreateAccount_styles'; // Importa tus estilos
+
 
 const CreateAccount = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [passwordStrength, setPasswordStrength] = useState({ color: '#ccc', text: '' });
-  const router = useRouter(); 
+  const router = useRouter(); // Hook para manejar la navegación
+
+  // Función para evaluar la fortaleza de la contraseña
+  const getPasswordStrength = (pwd: string) => {
+    if (pwd.length === 0) return { strength: 'none', color: 'transparent', text: '' };
+    if (pwd.length < 6) return { strength: 'weak', color: '#FF6B6B', text: 'Muy débil' };
+    
+    const hasLetter = /[a-zA-Z]/.test(pwd);
+    const hasNumber = /[0-9]/.test(pwd);
+    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(pwd);
+    
+    if (pwd.length >= 8 && hasLetter && hasNumber && hasSpecial) {
+      return { strength: 'strong', color: '#4CAF50', text: 'Fuerte' };
+    } else if (pwd.length >= 6 && hasLetter && hasNumber) {
+      return { strength: 'medium', color: '#FFA726', text: 'Buena' };
+    } else {
+      return { strength: 'weak', color: '#FF6B6B', text: 'Débil' };
+    }
+  };
+
+  const passwordStrength = getPasswordStrength(password);
+>>>>>>> refs/remotes/origin/main
+
 
   const handleCreateAccount = async () => {
     if (isLoading) return;
@@ -127,4 +148,102 @@ const CreateAccount = () => {
   );
 };
 
+<<<<<<< HEAD
+=======
+const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    backgroundColor: '#565EB3' 
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#565EB3',
+    alignItems: 'center',
+    padding: verticalScale(40),
+    paddingTop: verticalScale(140), // Espacio superior en lugar de top
+    justifyContent: 'space-between', // Distribuye el espacio entre contenido y footer
+  },
+  content: {
+    flex: 1,
+    width: '100%',
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 24,
+    color: 'white',
+    fontWeight: 'bold',
+    marginBottom: verticalScale(20),
+  },
+  label: {
+    fontSize: 16,
+    color: 'white',
+    alignSelf: 'flex-start',
+    marginLeft: moderateScale(20),
+    marginBottom: verticalScale(5),
+  },
+  passwordDescription: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.8)',
+    alignSelf: 'flex-start',
+    marginLeft: moderateScale(20),
+    marginBottom: verticalScale(8),
+    fontStyle: 'italic',
+  },
+  passwordStrengthContainer: {
+    width: '90%',
+    marginBottom: verticalScale(10),
+    alignItems: 'flex-start',
+    paddingLeft: moderateScale(20),
+  },
+  passwordStrengthBar: {
+    height: 3,
+    width: '30%',
+    borderRadius: 2,
+    marginBottom: verticalScale(5),
+  },
+  passwordStrengthText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  input: {
+    width: '90%',
+    backgroundColor: 'white',
+    borderRadius: moderateScale(5),
+    padding: verticalScale(10),
+    marginBottom: verticalScale(15),
+    fontSize: 16,
+  },
+  button: {
+    backgroundColor: '#262E93',
+    paddingVertical: verticalScale(10),
+    paddingHorizontal: verticalScale(50),
+    borderRadius: moderateScale(5),
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: verticalScale(10),
+  },
+  buttonDisabled: {
+    backgroundColor: '#8A8FB0',
+    opacity: 0.7,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  footer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: verticalScale(20),
+    paddingBottom: verticalScale(20),
+  },
+  footerText: {
+    color: 'white',
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  
+});
+
+>>>>>>> refs/remotes/origin/main
 export default CreateAccount;

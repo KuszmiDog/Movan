@@ -4,6 +4,9 @@ export interface User {
   id: string;
   email: string;
   password: string;
+  name?: string;
+  role?: 'Private' | 'Particular';
+  isOnboardingComplete?: boolean;
   createdAt: string;
 }
 
@@ -79,6 +82,9 @@ export class UserService {
       users.push(newUser);
       await AsyncStorage.setItem(USERS_KEY, JSON.stringify(users));
 
+      // Establecer como usuario actual
+      await AsyncStorage.setItem(CURRENT_USER_KEY, JSON.stringify(newUser));
+
       return { 
         success: true, 
         message: 'Usuario registrado exitosamente',
@@ -107,6 +113,120 @@ export class UserService {
     } catch (error) {
       console.error('Error en inicio de sesión:', error);
       return { success: false, message: 'Error interno del servidor' };
+    }
+  }
+
+  // Método de login
+  static async login(email: string, password: string): Promise<{ success: boolean; message: string; user?: User }> {
+    try {
+      const users = await this.getUsers();
+      const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+      
+      if (!user) {
+        return { success: false, message: 'Usuario no encontrado' };
+      }
+      
+      if (user.password !== password) {
+        return { success: false, message: 'Contraseña incorrecta' };
+      }
+      
+      // Establecer como usuario actual
+      await AsyncStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+      
+      return { success: true, message: 'Inicio de sesión exitoso', user };
+    } catch (error) {
+      console.error('Error en login:', error);
+      return { success: false, message: 'Error al iniciar sesión' };
+    }
+  }
+
+  // Método de registro
+  static async register(userData: { email: string; password: string; name?: string }): Promise<{ success: boolean; message: string; user?: User }> {
+    try {
+      const result = await this.registerUser(userData.email, userData.password);
+      
+      if (result.success && result.user) {
+        // Actualizar con datos adicionales si se proporcionan
+        if (userData.name) {
+          const updatedUser = { ...result.user, name: userData.name };
+          await this.updateUser(result.user.id, { name: userData.name });
+          result.user = updatedUser;
+        }
+        
+        // Establecer como usuario actual
+        await AsyncStorage.setItem(CURRENT_USER_KEY, JSON.stringify(result.user));
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('Error en register:', error);
+      return { success: false, message: 'Error al registrar usuario' };
+    }
+  }
+
+  // Actualizar datos del usuario
+  static async updateUser(userId: string, updateData: Partial<User>): Promise<{ success: boolean; message: string }> {
+    try {
+      const users = await this.getUsers();
+      const userIndex = users.findIndex(u => u.id === userId);
+      
+      if (userIndex === -1) {
+        return { success: false, message: 'Usuario no encontrado' };
+      }
+      
+      // Actualizar los datos del usuario
+      users[userIndex] = { ...users[userIndex], ...updateData };
+      
+      // Guardar la lista actualizada
+      await AsyncStorage.setItem(USERS_KEY, JSON.stringify(users));
+      
+      // Si es el usuario actual, actualizar también el current user
+      const currentUser = await this.getCurrentUser();
+      if (currentUser && currentUser.id === userId) {
+        await AsyncStorage.setItem(CURRENT_USER_KEY, JSON.stringify(users[userIndex]));
+      }
+      
+      return { success: true, message: 'Usuario actualizado correctamente' };
+    } catch (error) {
+      console.error('Error actualizando usuario:', error);
+      return { success: false, message: 'Error actualizando usuario' };
+    }
+  }
+
+  // Actualizar rol del usuario
+  static async updateUserRole(userId: string, role: 'Private' | 'Particular'): Promise<{ success: boolean; message: string; user?: User }> {
+    try {
+      // Obtener usuarios existentes
+      const users = await this.getUsers();
+      
+      // Encontrar y actualizar el usuario
+      const userIndex = users.findIndex(user => user.id === userId);
+      if (userIndex === -1) {
+        return { success: false, message: 'Usuario no encontrado' };
+      }
+
+      // Actualizar el rol
+      users[userIndex].role = role;
+
+      // Guardar la lista actualizada
+      await AsyncStorage.setItem(USERS_KEY, JSON.stringify(users));
+
+      // Actualizar usuario actual si es el mismo
+      const currentUser = await this.getCurrentUser();
+      if (currentUser && currentUser.id === userId) {
+        const updatedCurrentUser = { ...currentUser, role };
+        await AsyncStorage.setItem(CURRENT_USER_KEY, JSON.stringify(updatedCurrentUser));
+      }
+
+      return { 
+        success: true, 
+        message: 'Rol actualizado exitosamente',
+        user: users[userIndex]
+      };
+
+    } catch (error) {
+      console.error('Error actualizando rol:', error);
+      return { success: false, message: 'Error actualizando el rol' };
     }
   }
 

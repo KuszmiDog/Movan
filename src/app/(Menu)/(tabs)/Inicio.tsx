@@ -1,10 +1,39 @@
 import { router } from 'expo-router';
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, BackHandler, Alert } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { moderateScale, verticalScale } from 'react-native-size-matters';
 
 const MovanMenu = () => {
+  // Manejar el botón atrás para mostrar alerta de cerrar app
+  useEffect(() => {
+    const backAction = () => {
+      Alert.alert(
+        'Salir de la aplicación',
+        '¿Estás seguro de que quieres cerrar la aplicación?',
+        [
+          {
+            text: 'Cancelar',
+            onPress: () => null,
+            style: 'cancel',
+          },
+          {
+            text: 'Salir',
+            onPress: () => BackHandler.exitApp(),
+          },
+        ]
+      );
+      return true; // Previene el comportamiento por defecto
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, []);
+
   // Datos de ejemplo
   const stats = {
     enviosCompletados: 24,
@@ -13,9 +42,9 @@ const MovanMenu = () => {
     gananciasSemanales: '$15,400'
   };
 
-  const handleNavigation = (screen) => {
+  const handleNavigation = (screen: string) => {
     console.log(`Navegando a: ${screen}`);
-    router.push(screen)
+    router.push(screen as any);
   };
 
   return (

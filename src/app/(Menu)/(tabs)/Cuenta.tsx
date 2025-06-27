@@ -1,4 +1,4 @@
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useState, useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
@@ -7,10 +7,12 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import imagePaths from '@/src/constants/imagePaths';
 import { moderateScale, verticalScale } from 'react-native-size-matters';
 import { router } from 'expo-router';
+import { useAuth } from '../../../utils/AuthContext';
 
 export default function AccountScreen() {
   const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [userMail, setUserMail] = useState<string | null>(null);
+  const { user, logout } = useAuth();
 
   useFocusEffect(
     useCallback(() => {
@@ -117,6 +119,33 @@ export default function AccountScreen() {
           <MaterialCommunityIcons name="account-edit" size={24} color="white" />
           <Text style={styles.editButtonText}>Editar Perfil</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.logoutButton}
+          onPress={() => {
+            Alert.alert(
+              'Cerrar Sesión',
+              '¿Estás seguro de que quieres cerrar sesión?',
+              [
+                {
+                  text: 'Cancelar',
+                  style: 'cancel',
+                },
+                {
+                  text: 'Cerrar Sesión',
+                  style: 'destructive',
+                  onPress: async () => {
+                    await logout();
+                    router.replace('/(auth)/movan_introduction');
+                  },
+                },
+              ]
+            );
+          }}
+        >
+          <MaterialCommunityIcons name="logout" size={24} color="white" />
+          <Text style={styles.logoutButtonText}>Cerrar Sesión</Text>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
@@ -222,6 +251,22 @@ const styles = StyleSheet.create({
     margin: moderateScale(20),
   },
   editButtonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginLeft: moderateScale(10),
+  },
+  logoutButton: {
+    backgroundColor: '#FF4444',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: moderateScale(15),
+    borderRadius: moderateScale(10),
+    margin: moderateScale(20),
+    marginTop: 0,
+  },
+  logoutButtonText: {
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',

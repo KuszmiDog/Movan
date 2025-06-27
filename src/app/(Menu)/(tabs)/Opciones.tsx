@@ -53,13 +53,7 @@ const Opciones = () => {
           <Text style={styles.menuButtonText}>Términos y Condiciones</Text>
         </TouchableOpacity>
 
-        {/* Cerrar Sesión */}
-        <TouchableOpacity 
-          style={[styles.menuButton, styles.logoutButton]} 
-          onPress={() => handleNavigation('/(auth)/AccountLogin')}
-        >
-          <Text style={styles.menuButtonText}>Cerrar Sesión</Text>
-        </TouchableOpacity>
+        
       </View>
     </View>
   );

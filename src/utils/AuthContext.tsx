@@ -1,67 +1,210 @@
-import { View, Text } from 'react-native'
-import React, { Children, useEffect } from 'react'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { UserService } from './UserService';
 
-const AuthContext = React.createContext({
-  user: null,
-  signIn: async (username) => {},
-  signOut: async () => {}
-  })
-
-// Desarrollo del provider de contexto
-
-export const AuthProvider = ({ children }) => {
-    const [user, setUser] = React.useState(null);
-
-    //busqueda del usuario en AsyncStorage al iniciar la aplicacion
-    //si existe, se establece el estado del usuario
-    //si no existe, el estado del usuario se mantiene como null
-    //esto permite que el usuario permanezca autenticado incluso si la aplicacion se cierra
-    //y se vuelve a abrir, siempre y cuando el usuario haya iniciado sesion previamente
-    useEffect(() => {
-        const getUser = async () => {
-            const user = await AsyncStorage.getItem('user');
-            if (user) {
-                setUser(JSON.parse(user));
-            }
-        };
-        getUser();
-    }, []);
-
-    
-
-    //funcion para iniciar sesion, recibe el nombre de usuario
-    //y establece el estado del usuario y lo guarda en AsyncStorage
-    //esto permite que el usuario permanezca autenticado incluso si la aplicacion se cierra
-    //y se vuelve a abrir, siempre y cuando el usuario haya iniciado sesion previamente
-    //la funcion es asincrona para poder esperar a que se guarde el usuario en AsyncStorage
-    //y evitar problemas de sincronizacion
-    //la funcion se puede llamar desde cualquier componente que consuma el contexto de autenticacion
-    //por ejemplo, desde un formulario de inicio de sesion
-    const signIn = async (username) => {
-        setUser({ username });
-        await AsyncStorage.setItem('user', JSON.stringify({ username }));
-    };
-
-
-
-    //funcion para cerrar sesion, establece el estado del usuario como null
-    //y elimina el usuario de AsyncStorage
-    //esto permite que el usuario no permanezca autenticado si cierra sesion
-    //la funcion es asincrona para poder esperar a que se elimine el usuario de AsyncStorage
-    //y evitar problemas de sincronizacion
-    //la funcion se puede llamar desde cualquier componente que consuma el contexto de autenticacion
-    //por ejemplo, desde un boton de cerrar sesion
-    const signOut = async () => {
-        setUser(null);
-        await AsyncStorage.removeItem('user');
-    };
-
-    return (
-        <AuthContext.Provider value={{ user, signIn, signOut }}>
-            {children}
-        </AuthContext.Provider>
-    );
+export interface User {
+  id: string;
+  email: string;
+  name?: string;
+  role?: 'Private' | 'Particular';
+  isOnboardingComplete?: boolean;
 }
 
-export default AuthContext
+interface AuthContextType {
+  user: User | null;
+  isLoading: boolean;
+  isAuthenticated: boolean;
+  login: (email: string, password: string) => Promise<{ success: boolean; message: string }>;
+  register: (userData: any) => Promise<{ success: boolean; message: string }>;
+  logout: () => Promise<void>;
+  updateUser: (userData: Partial<User>) => Promise<void>;
+  completeOnboarding: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
+
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Verificar sesión al iniciar la app
+  useEffect(() => {
+    checkAuthState();
+  }, []);
+
+  const checkAuthState = async () => {
+    try {
+      setIsLoading(true);
+      
+      // Verificar si hay una sesión activa
+      const sessionData = await AsyncStorage.getItem('@auth_session');
+      
+      if (sessionData) {
+        const { userId, timestamp } = JSON.parse(sessionData);
+        
+        // Verificar si la sesión no ha expirado (30 días)
+        const now = new Date().getTime();
+        const sessionAge = now - timestamp;
+        const thirtyDays = 30 * 24 * 60 * 60 * 1000;
+        
+        if (sessionAge < thirtyDays) {
+          // Sesión válida, obtener datos del usuario
+          const currentUser = await UserService.getCurrentUser();
+          
+          if (currentUser) {
+            setUser(currentUser);
+            setIsAuthenticated(true);
+          } else {
+            // Usuario no encontrado, limpiar sesión
+            await clearSession();
+          }
+        } else {
+          // Sesión expirada
+          await clearSession();
+        }
+      }
+    } catch (error) {
+      console.error('Error checking auth state:', error);
+      await clearSession();
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const createSession = async (userId: string) => {
+    try {
+      const sessionData = {
+        userId,
+        timestamp: new Date().getTime()
+      };
+      
+      await AsyncStorage.setItem('@auth_session', JSON.stringify(sessionData));
+    } catch (error) {
+      console.error('Error creating session:', error);
+    }
+  };
+
+  const clearSession = async () => {
+    try {
+      await AsyncStorage.removeItem('@auth_session');
+      setUser(null);
+      setIsAuthenticated(false);
+    } catch (error) {
+      console.error('Error clearing session:', error);
+    }
+  };
+
+  const login = async (email: string, password: string) => {
+    try {
+      setIsLoading(true);
+      
+      const result = await UserService.login(email, password);
+      
+      if (result.success && result.user) {
+        setUser(result.user);
+        setIsAuthenticated(true);
+        await createSession(result.user.id);
+        
+        return { success: true, message: 'Inicio de sesión exitoso' };
+      } else {
+        return { success: false, message: result.message };
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      return { success: false, message: 'Error al iniciar sesión' };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const register = async (userData: any) => {
+    try {
+      setIsLoading(true);
+      
+      const result = await UserService.register(userData);
+      
+      if (result.success && result.user) {
+        setUser(result.user);
+        setIsAuthenticated(true);
+        await createSession(result.user.id);
+        
+        return { success: true, message: 'Registro exitoso' };
+      } else {
+        return { success: false, message: result.message };
+      }
+    } catch (error) {
+      console.error('Register error:', error);
+      return { success: false, message: 'Error al registrar usuario' };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const logout = async () => {
+    try {
+      setIsLoading(true);
+      await clearSession();
+      // También limpiar otros datos si es necesario
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const updateUser = async (userData: Partial<User>) => {
+    try {
+      if (user) {
+        const updatedUser = { ...user, ...userData };
+        setUser(updatedUser);
+        
+        // Actualizar en UserService también
+        await UserService.updateUser(user.id, userData);
+      }
+    } catch (error) {
+      console.error('Update user error:', error);
+    }
+  };
+
+  const completeOnboarding = async () => {
+    try {
+      if (user) {
+        const updatedUser = { ...user, isOnboardingComplete: true };
+        setUser(updatedUser);
+        
+        // Actualizar en UserService
+        await UserService.updateUser(user.id, { isOnboardingComplete: true });
+      }
+    } catch (error) {
+      console.error('Complete onboarding error:', error);
+    }
+  };
+
+  const value: AuthContextType = {
+    user,
+    isLoading,
+    isAuthenticated,
+    login,
+    register,
+    logout,
+    updateUser,
+    completeOnboarding
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+
+export default AuthContext;

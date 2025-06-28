@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { UserService } from '../../utils/UserService';
+import { useAuth } from '../../utils/AuthContext';
 import styles from '@/src/constants/CreateAccount_styles/CreateAccount_styles'; // Importa tus estilos
 
 
@@ -10,7 +10,7 @@ const CreateAccount = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const { register, isLoading } = useAuth();
   const router = useRouter(); // Hook para manejar la navegación
 
   // Función para evaluar la fortaleza de la contraseña
@@ -33,7 +33,6 @@ const CreateAccount = () => {
 
   const passwordStrength = getPasswordStrength(password);
 
-
   const handleCreateAccount = async () => {
     if (isLoading) return;
 
@@ -48,21 +47,18 @@ const CreateAccount = () => {
       return;
     }
 
-    setIsLoading(true);
-
     try {
-      // Registrar usuario usando AsyncStorage
-      const result = await UserService.registerUser(email, password);
+      // Registrar usuario usando el contexto de autenticación
+      const result = await register({ email, password });
       
       if (result.success) {
         Alert.alert(
           'Éxito', 
-          'Cuenta creada exitosamente',
+          'Cuenta creada exitosamente. Ahora selecciona tu tipo de usuario.',
           [
             {
               text: 'Continuar',
               onPress: () => {
-                console.log('Usuario registrado:', result.user);
                 router.push('/(AccountCreation)/RolSelection'); // Navegar a RolSelection
               }
             }
@@ -74,8 +70,6 @@ const CreateAccount = () => {
     } catch (error) {
       console.error('Error creando cuenta:', error);
       Alert.alert('Error', 'Ocurrió un error inesperado. Intenta nuevamente.');
-    } finally {
-      setIsLoading(false);
     }
   };
 

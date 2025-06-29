@@ -1,9 +1,10 @@
-
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, BackHandler, Alert, RefreshControl } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { moderateScale, verticalScale } from 'react-native-size-matters';
 import { useAuth } from '../../../utils/AuthContext';
+import { usePedido } from '../../../utils/PedidoContext';
+import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Pedido } from '@/src/components/UserPosts/SimulatedPosts';
 import { pedidosSimulados } from '@/src/components/UserPosts/SimulatedPosts';
@@ -12,6 +13,8 @@ type EstadoCamionero = 'disponible' | 'ocupado' | 'fuera_servicio';
 
 const MovanMenu = () => {
   const { user } = useAuth();
+  const { setPedidoActivo: setPedidoActivoContext, setDestinoNavegacion, pedidoActivo: pedidoActivoContext } = usePedido();
+  const router = useRouter();
   const [estadoCamionero, setEstadoCamionero] = useState<EstadoCamionero>('disponible');
   const [pedidosDisponibles, setPedidosDisponibles] = useState<Pedido[]>([]);
   const [pedidoActivo, setPedidoActivo] = useState<Pedido | null>(null);
@@ -55,6 +58,17 @@ const MovanMenu = () => {
     cargarPedidosDisponibles();
   }, []);
 
+  // Sincronizar estado local con contexto
+  useEffect(() => {
+    if (pedidoActivoContext) {
+      setPedidoActivo(pedidoActivoContext);
+      setEstadoCamionero('ocupado');
+    } else {
+      setPedidoActivo(null);
+      setEstadoCamionero('disponible');
+    }
+  }, [pedidoActivoContext]);
+
   // Estadísticas del camionero
   const stats = {
     enviosCompletados: 47,
@@ -93,10 +107,32 @@ const MovanMenu = () => {
         {
           text: 'Aceptar',
           onPress: () => {
+            // Actualizar estados locales
             setPedidoActivo(pedido);
             setEstadoCamionero('ocupado');
             setPedidosDisponibles(prev => prev.filter(p => p.id !== pedido.id));
-            Alert.alert('¡Pedido Aceptado!', 'El cliente ha sido notificado. Ve a la sección de navegación para iniciar el viaje.');
+            
+            // Actualizar contexto global
+            setPedidoActivoContext(pedido);
+            
+            // Configurar destino de navegación (origen del pedido)
+            setDestinoNavegacion({
+              latitude: pedido.origen.coordenadas.lat,
+              longitude: pedido.origen.coordenadas.lng,
+              address: pedido.origen.direccion
+            });
+            
+            // Mostrar alerta y navegar
+            Alert.alert(
+              '¡Pedido Aceptado!', 
+              'Te dirigiremos al mapa para navegar hacia el punto de recogida.',
+              [
+                {
+                  text: 'Ir al Mapa',
+                  onPress: () => router.push('/(Menu)/(tabs)/Buscar')
+                }
+              ]
+            );
           }
         }
       ]
@@ -221,10 +257,25 @@ const MovanMenu = () => {
             <Text style={styles.sectionTitle}>🚛 Pedido Activo</Text>
             <View style={styles.pedidoActivoCard}>
               <Text style={styles.clienteNombre}>{pedidoActivo.cliente.nombre}</Text>
+              <Text style={styles.direccion}>Origen: {pedidoActivo.origen.direccion}</Text>
               <Text style={styles.direccion}>Destino: {pedidoActivo.destino.direccion}</Text>
-              <TouchableOpacity style={styles.navegarButton}>
+              <Text style={styles.precio}>Pago: ${pedidoActivo.precio}</Text>
+              <TouchableOpacity 
+                style={styles.navegarButton}
+                onPress={() => {
+                  // Configurar destino de navegación (origen del pedido para recoger)
+                  setDestinoNavegacion({
+                    latitude: pedidoActivo.origen.coordenadas.lat,
+                    longitude: pedidoActivo.origen.coordenadas.lng,
+                    address: pedidoActivo.origen.direccion
+                  });
+                  
+                  // Navegar al mapa
+                  router.push('/(Menu)/(tabs)/Buscar');
+                }}
+              >
                 <MaterialCommunityIcons name="navigation" size={20} color="white" />
-                <Text style={styles.navegarButtonText}>Navegar</Text>
+                <Text style={styles.navegarButtonText}>Ir a Recoger</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -341,13 +392,18 @@ const styles = StyleSheet.create({
     borderRadius: moderateScale(10),
   },
   navegarButton: {
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: '#FF6B35',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: moderateScale(10),
-    borderRadius: moderateScale(8),
+    padding: moderateScale(12),
+    borderRadius: moderateScale(25),
     marginTop: verticalScale(10),
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
   navegarButtonText: {
     color: 'white',

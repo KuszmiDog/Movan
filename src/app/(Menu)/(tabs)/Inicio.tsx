@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, BackHandler, Aler
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { moderateScale, verticalScale } from 'react-native-size-matters';
 import { useAuth } from '../../../utils/AuthContext';
-import { usePedido } from '../../../utils/PedidoContext';
+import { usePedido, EstadoPedido } from '../../../utils/PedidoContext';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Pedido } from '@/src/components/UserPosts/SimulatedPosts';
@@ -13,7 +13,14 @@ type EstadoCamionero = 'disponible' | 'ocupado' | 'fuera_servicio';
 
 const MovanMenu = () => {
   const { user } = useAuth();
-  const { setPedidoActivo: setPedidoActivoContext, setDestinoNavegacion, pedidoActivo: pedidoActivoContext } = usePedido();
+  const { 
+    setPedidoActivo: setPedidoActivoContext, 
+    setDestinoNavegacion, 
+    pedidoActivo: pedidoActivoContext,
+    estadoPedido,
+    setEstadoPedido,
+    confirmarRecogida
+  } = usePedido();
   const router = useRouter();
   const [estadoCamionero, setEstadoCamionero] = useState<EstadoCamionero>('disponible');
   const [pedidosDisponibles, setPedidosDisponibles] = useState<Pedido[]>([]);
@@ -114,6 +121,7 @@ const MovanMenu = () => {
             
             // Actualizar contexto global
             setPedidoActivoContext(pedido);
+            setEstadoPedido('recogiendo');
             
             // Configurar destino de navegación (origen del pedido)
             setDestinoNavegacion({
@@ -256,27 +264,123 @@ const MovanMenu = () => {
           <View style={styles.pedidoActivoContainer}>
             <Text style={styles.sectionTitle}>🚛 Pedido Activo</Text>
             <View style={styles.pedidoActivoCard}>
-              <Text style={styles.clienteNombre}>{pedidoActivo.cliente.nombre}</Text>
-              <Text style={styles.direccion}>Origen: {pedidoActivo.origen.direccion}</Text>
-              <Text style={styles.direccion}>Destino: {pedidoActivo.destino.direccion}</Text>
-              <Text style={styles.precio}>Pago: ${pedidoActivo.precio}</Text>
-              <TouchableOpacity 
-                style={styles.navegarButton}
-                onPress={() => {
-                  // Configurar destino de navegación (origen del pedido para recoger)
-                  setDestinoNavegacion({
-                    latitude: pedidoActivo.origen.coordenadas.lat,
-                    longitude: pedidoActivo.origen.coordenadas.lng,
-                    address: pedidoActivo.origen.direccion
-                  });
-                  
-                  // Navegar al mapa
-                  router.push('/(Menu)/(tabs)/Buscar');
-                }}
-              >
-                <MaterialCommunityIcons name="navigation" size={20} color="white" />
-                <Text style={styles.navegarButtonText}>Ir a Recoger</Text>
-              </TouchableOpacity>
+              {/* Header con información del cliente y estado */}
+              <View style={styles.pedidoActivoHeader}>
+                <View style={styles.clienteActivoInfo}>
+                  <Text style={styles.clienteActivoNombre}>{pedidoActivo.cliente.nombre}</Text>
+                  <View style={styles.calificacionContainer}>
+                    <MaterialCommunityIcons name="star" size={16} color="#FFD700" />
+                    <Text style={styles.calificacionActivo}>{pedidoActivo.cliente.calificacion}</Text>
+                  </View>
+                </View>
+                <Text style={styles.estadoPedidoTexto}>
+                  {estadoPedido === 'recogiendo' ? 'Dirigiéndose a recoger' : 
+                   estadoPedido === 'recogido' ? 'Dirigiéndose a entregar' : 
+                   'En proceso'}
+                </Text>
+              </View>
+
+              {/* Información de la ruta */}
+              <View style={styles.rutaActivaContainer}>
+                <View style={styles.direccionRow}>
+                  <MaterialCommunityIcons 
+                    name="map-marker" 
+                    size={20} 
+                    color={estadoPedido === 'recogiendo' ? "#FF6B35" : "#4CAF50"} 
+                  />
+                  <View style={styles.direccionInfo}>
+                    <Text style={styles.direccionLabel}>Origen</Text>
+                    <Text style={styles.direccionTexto}>{pedidoActivo.origen.direccion}</Text>
+                  </View>
+                </View>
+                
+                <View style={styles.separadorRuta}>
+                  <MaterialCommunityIcons name="arrow-down" size={20} color="rgba(255,255,255,0.6)" />
+                </View>
+                
+                <View style={styles.direccionRow}>
+                  <MaterialCommunityIcons 
+                    name="map-marker-check" 
+                    size={20} 
+                    color={estadoPedido === 'recogido' ? "#FF6B35" : "#F44336"} 
+                  />
+                  <View style={styles.direccionInfo}>
+                    <Text style={styles.direccionLabel}>Destino</Text>
+                    <Text style={styles.direccionTexto}>{pedidoActivo.destino.direccion}</Text>
+                  </View>
+                </View>
+              </View>
+
+              {/* Detalles del pedido */}
+              <View style={styles.detallesActivoContainer}>
+                <View style={styles.detalleActivo}>
+                  <MaterialCommunityIcons name="package-variant" size={18} color="rgba(255,255,255,0.8)" />
+                  <Text style={styles.detalleActivoTexto}>{pedidoActivo.carga.tipo} ({pedidoActivo.carga.peso}kg)</Text>
+                </View>
+                <View style={styles.detalleActivo}>
+                  <MaterialCommunityIcons name="map" size={18} color="rgba(255,255,255,0.8)" />
+                  <Text style={styles.detalleActivoTexto}>{pedidoActivo.distancia}km • {Math.round(pedidoActivo.tiempoEstimado/60)}h</Text>
+                </View>
+                <View style={styles.detalleActivo}>
+                  <MaterialCommunityIcons name="cash" size={18} color="rgba(255,255,255,0.8)" />
+                  <Text style={styles.pagoTexto}>${pedidoActivo.precio}</Text>
+                </View>
+              </View>
+
+              {/* Botones de acción */}
+              <View style={styles.botonesContainer}>
+                <TouchableOpacity 
+                  style={styles.navegarButton}
+                  onPress={() => {
+                    const destino = estadoPedido === 'recogiendo' 
+                      ? {
+                          latitude: pedidoActivo.origen.coordenadas.lat,
+                          longitude: pedidoActivo.origen.coordenadas.lng,
+                          address: pedidoActivo.origen.direccion
+                        }
+                      : {
+                          latitude: pedidoActivo.destino.coordenadas.lat,
+                          longitude: pedidoActivo.destino.coordenadas.lng,
+                          address: pedidoActivo.destino.direccion
+                        };
+                    
+                    setDestinoNavegacion(destino);
+                    router.push('/(Menu)/(tabs)/Buscar');
+                  }}
+                >
+                  <MaterialCommunityIcons name="navigation" size={20} color="white" />
+                  <Text style={styles.navegarButtonText}>
+                    {estadoPedido === 'recogiendo' ? 'Ir a Recoger' : 'Ir a Entregar'}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity 
+                  style={styles.cancelarButton}
+                  onPress={() => {
+                    Alert.alert(
+                      'Cancelar Pedido',
+                      '¿Estás seguro de que quieres cancelar este pedido?',
+                      [
+                        { text: 'No', style: 'cancel' },
+                        {
+                          text: 'Sí, Cancelar',
+                          style: 'destructive',
+                          onPress: () => {
+                            setPedidoActivoContext(null);
+                            setEstadoPedido(null);
+                            setDestinoNavegacion(null);
+                            setPedidoActivo(null);
+                            setEstadoCamionero('disponible');
+                          }
+                        }
+                      ]
+                    );
+                  }}
+                >
+                  <MaterialCommunityIcons name="close" size={20} color="white" />
+                  <Text style={styles.cancelarButtonText}>Cancelar</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         )}
@@ -387,18 +491,117 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(20),
   },
   pedidoActivoCard: {
-    backgroundColor: '#4CAF50',
-    padding: moderateScale(15),
-    borderRadius: moderateScale(10),
+    backgroundColor: '#262E93',
+    borderRadius: moderateScale(12),
+    padding: moderateScale(20),
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+  },
+  pedidoActivoHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: verticalScale(15),
+  },
+  clienteActivoInfo: {
+    flex: 1,
+  },
+  clienteActivoNombre: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: verticalScale(5),
+  },
+  calificacionActivo: {
+    color: 'white',
+    marginLeft: moderateScale(5),
+    fontSize: 14,
+  },
+  estadoPedidoTexto: {
+    color: '#FFD700',
+    fontSize: 14,
+    fontWeight: '600',
+    fontStyle: 'italic',
+  },
+  rutaActivaContainer: {
+    marginVertical: verticalScale(15),
+  },
+  direccionRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginVertical: verticalScale(8),
+  },
+  direccionInfo: {
+    marginLeft: moderateScale(12),
+    flex: 1,
+  },
+  direccionLabel: {
+    color: 'rgba(255,255,255,0.7)',
+    fontSize: 12,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    marginBottom: verticalScale(2),
+  },
+  direccionTexto: {
+    color: 'white',
+    fontSize: 14,
+    lineHeight: 18,
+  },
+  separadorRuta: {
+    alignItems: 'center',
+    marginVertical: verticalScale(5),
+  },
+  detallesActivoContainer: {
+    marginVertical: verticalScale(15),
+    paddingTop: verticalScale(15),
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.2)',
+  },
+  detalleActivo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: verticalScale(6),
+  },
+  detalleActivoTexto: {
+    color: 'white',
+    marginLeft: moderateScale(10),
+    fontSize: 14,
+    opacity: 0.9,
+  },
+  pagoTexto: {
+    color: '#4CAF50',
+    marginLeft: moderateScale(10),
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  botonesContainer: {
+    flexDirection: 'row',
+    marginTop: verticalScale(20),
+    gap: moderateScale(10),
+  },
+  cancelarButton: {
+    flex: 1,
+    backgroundColor: '#F44336',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: verticalScale(12),
+    borderRadius: moderateScale(25),
+  },
+  cancelarButtonText: {
+    color: 'white',
+    fontWeight: '600',
+    fontSize: 14,
+    marginLeft: moderateScale(6),
   },
   navegarButton: {
+    flex: 2,
     backgroundColor: '#FF6B35',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: moderateScale(12),
+    paddingVertical: verticalScale(12),
     borderRadius: moderateScale(25),
-    marginTop: verticalScale(10),
     elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -408,7 +611,8 @@ const styles = StyleSheet.create({
   navegarButtonText: {
     color: 'white',
     fontWeight: 'bold',
-    marginLeft: moderateScale(5),
+    fontSize: 16,
+    marginLeft: moderateScale(8),
   },
   pedidosContainer: {
     paddingHorizontal: moderateScale(20),

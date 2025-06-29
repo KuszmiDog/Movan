@@ -1,20 +1,10 @@
-export const markers  = [
-  {
-    //-27.472167, -58.973207
-    nombre: 'Marker 1',
-    latitud: -27.472167,
-    longitud: -58.973207,
-    latitudeDelta: 0.0922,
-    longitudeDelta: 0.0421
-    },
+import { pedidosSimulados } from '../../components/UserPosts/SimulatedPosts';
 
-  {
-    //
-    nombre: 'Marker 2',
-    latitud: -27.467712,
-    longitud: -58.971194,
-    latitudeDelta: 0.0922,
-    longitudeDelta: 0.0421
-  },
-
-];
+export const markers = pedidosSimulados.map((pedido) => ({
+  nombre: `Pedido ${pedido.id} - ${pedido.cliente.nombre}`,
+  imagen: pedido.imagen, 
+  latitud: pedido.origen.coordenadas.lat,
+  longitud: pedido.origen.coordenadas.lng,
+  latitudeDelta: 0.0922,
+  longitudeDelta: 0.0421,
+}));

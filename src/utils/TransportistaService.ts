@@ -168,7 +168,7 @@ export class TransportistaService {
     }
   }
 
-  // Limpiar todos los datos (para desarrollo)
+  // Limpiamos todos los datos
   static async limpiarTodosLosDatos(): Promise<void> {
     try {
       await AsyncStorage.removeItem(TRANSPORTISTAS_KEY);

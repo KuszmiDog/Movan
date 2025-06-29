@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, Image } from 'react-native';
 import MapView, { Callout, Marker } from 'react-native-maps';
 import styles from '@/src/constants/MovanMap_styles/MovanMapScreen_styles';
 import * as Location from 'expo-location';
@@ -85,6 +85,20 @@ export default function MovanMap() {
       }
     : null;
 
+  function getDistanceFromLatLonInKm(lat1: number, lon1: number, lat2: number, lon2: number) {
+    const R = 6371; // Radio de la tierra en km
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLon = ((lon2 - lon1) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos((lat1 * Math.PI) / 180) *
+        Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }
+
   return (
     <View style={{flex: 1}}> 
       
@@ -105,9 +119,21 @@ export default function MovanMap() {
             }}
             onPress={() => onMarkerSelect(marker)}
           >
+            <Image
+              source={marker.imagen ? marker.imagen : require('../../assets/images/not-found/Image-not-found.png')}
+              style={{
+                width: 40, // tamaño personalizado
+                height: 40,
+                borderRadius: 20, // si quieres que sea circular
+                borderWidth: 2,
+                borderColor: '#fff',
+                backgroundColor: '#fff',
+                resizeMode: 'cover', // o 'contain'
+              }}
+            />
             <Callout>
               <View style={styles.calloutContainer}>
-                <Text style={styles.markertext}> {marker.nombre}</Text>
+                <Text style={styles.markertext}>{marker.nombre}</Text>
               </View>
             </Callout>
           </Marker>
@@ -126,6 +152,42 @@ export default function MovanMap() {
           />
         )}
       </MapView>
+
+      {selectedMarker && usercurrentlocation && (
+        <View
+          style={{
+            position: 'absolute',
+            bottom: 30,
+            left: 20,
+            backgroundColor: 'rgba(255,255,255,0.95)',
+            padding: 12,
+            borderRadius: 10,
+            elevation: 4,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.2,
+            shadowRadius: 4,
+            minWidth: 200,
+          }}
+        >
+          <Text style={{ fontWeight: 'bold', fontSize: 16, color: '#565EB3' }}>
+            Destino:
+          </Text>
+          <Text style={{ fontSize: 14, color: '#222', marginBottom: 4 }}>
+            {selectedMarker.nombre}
+          </Text>
+          <Text style={{ fontSize: 13, color: '#444' }}>
+            Distancia: {(
+              getDistanceFromLatLonInKm(
+                usercurrentlocation.latitude,
+                usercurrentlocation.longitude,
+                selectedMarker.latitud,
+                selectedMarker.longitud
+              )
+            ).toFixed(2)} km
+          </Text>
+        </View>
+      )}
     </View>
   );
 }

@@ -1,39 +1,12 @@
-import { router } from 'expo-router';
+
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, BackHandler, Alert, RefreshControl } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { moderateScale, verticalScale } from 'react-native-size-matters';
 import { useAuth } from '../../../utils/AuthContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-// Tipos para el sistema de pedidos
-interface Pedido {
-  id: string;
-  cliente: {
-    nombre: string;
-    telefono: string;
-    calificacion: number;
-  };
-  origen: {
-    direccion: string;
-    coordenadas: { lat: number; lng: number };
-  };
-  destino: {
-    direccion: string;
-    coordenadas: { lat: number; lng: number };
-  };
-  carga: {
-    tipo: string;
-    peso: number;
-    descripcion: string;
-  };
-  precio: number;
-  distancia: number;
-  tiempoEstimado: number;
-  fechaRequerida: Date;
-  estado: 'disponible' | 'asignado' | 'en_curso' | 'completado';
-  prioridad: 'normal' | 'urgente';
-}
+import { Pedido } from '@/src/components/UserPosts/SimulatedPosts';
+import { pedidosSimulados } from '@/src/components/UserPosts/SimulatedPosts';
 
 type EstadoCamionero = 'disponible' | 'ocupado' | 'fuera_servicio';
 
@@ -75,36 +48,7 @@ const MovanMenu = () => {
 
   // Cargar pedidos disponibles (simulación)
   const cargarPedidosDisponibles = async () => {
-    // Simulación de datos - aquí se conectaría con una API real
-    const pedidosSimulados: Pedido[] = [
-      {
-        id: '1',
-        cliente: { nombre: 'Carlos Ruiz', telefono: '+52 555 1234', calificacion: 4.8 },
-        origen: { direccion: 'Av. Insurgentes 123, CDMX', coordenadas: { lat: 19.4326, lng: -99.1332 } },
-        destino: { direccion: 'Calle 5 de Mayo 456, Puebla', coordenadas: { lat: 19.0414, lng: -98.2063 } },
-        carga: { tipo: 'Electrodomésticos', peso: 850, descripcion: 'Refrigerador y lavadora' },
-        precio: 2500,
-        distancia: 120,
-        tiempoEstimado: 180,
-        fechaRequerida: new Date(Date.now() + 86400000),
-        estado: 'disponible',
-        prioridad: 'normal'
-      },
-      {
-        id: '2',
-        cliente: { nombre: 'María González', telefono: '+52 555 5678', calificacion: 4.9 },
-        origen: { direccion: 'Centro Histórico, CDMX', coordenadas: { lat: 19.4326, lng: -99.1332 } },
-        destino: { direccion: 'Zona Industrial, Toluca', coordenadas: { lat: 19.2906, lng: -99.6544 } },
-        carga: { tipo: 'Muebles', peso: 1200, descripcion: 'Sala completa y comedor' },
-        precio: 1800,
-        distancia: 65,
-        tiempoEstimado: 120,
-        fechaRequerida: new Date(Date.now() + 172800000),
-        estado: 'disponible',
-        prioridad: 'urgente'
-      }
-    ];
-    setPedidosDisponibles(pedidosSimulados);
+    setPedidosDisponibles(pedidosSimulados.filter(pedido => pedido.estado === 'disponible'));
   };
 
   useEffect(() => {

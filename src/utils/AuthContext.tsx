@@ -6,6 +6,7 @@ export interface User {
   id: string;
   email: string;
   name?: string;
+  phone?: string;
   role?: 'Private' | 'Particular';
   isOnboardingComplete?: boolean;
 }
@@ -19,6 +20,7 @@ interface AuthContextType {
   logout: () => Promise<void>;
   updateUser: (userData: Partial<User>) => Promise<void>;
   completeOnboarding: () => Promise<void>;
+  reloadUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -51,9 +53,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       // Verificar si hay una sesión activa
       const sessionData = await AsyncStorage.getItem('@auth_session');
+      console.log('🔍 Session data:', sessionData);
       
       if (sessionData) {
         const { userId, timestamp } = JSON.parse(sessionData);
+        console.log('👤 User ID from session:', userId);
         
         // Verificar si la sesión no ha expirado (30 días)
         const now = new Date().getTime();
@@ -63,18 +67,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (sessionAge < thirtyDays) {
           // Sesión válida, obtener datos del usuario
           const currentUser = await UserService.getCurrentUser();
+          console.log('👤 Current user loaded:', currentUser);
           
           if (currentUser) {
             setUser(currentUser);
             setIsAuthenticated(true);
+            console.log('✅ User authenticated:', currentUser.email);
           } else {
+            console.log('❌ User not found, clearing session');
             // Usuario no encontrado, limpiar sesión
             await clearSession();
           }
         } else {
+          console.log('⏰ Session expired, clearing');
           // Sesión expirada
           await clearSession();
         }
+      } else {
+        console.log('🚫 No session found');
       }
     } catch (error) {
       console.error('Error checking auth state:', error);
@@ -179,6 +189,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const reloadUser = async () => {
+    try {
+      const currentUser = await UserService.getCurrentUser();
+      console.log('🔄 Reloading user:', currentUser);
+      if (currentUser) {
+        setUser(currentUser);
+        setIsAuthenticated(true);
+      }
+    } catch (error) {
+      console.error('Reload user error:', error);
+    }
+  };
+
   const completeOnboarding = async () => {
     try {
       if (user) {
@@ -201,7 +224,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     register,
     logout,
     updateUser,
-    completeOnboarding
+    completeOnboarding,
+    reloadUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

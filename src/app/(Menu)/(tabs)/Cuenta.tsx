@@ -1,6 +1,6 @@
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -8,59 +8,254 @@ import imagePaths from '@/src/constants/imagePaths';
 import { moderateScale, verticalScale } from 'react-native-size-matters';
 import { router } from 'expo-router';
 import { useAuth } from '../../../utils/AuthContext';
+import { UserService } from '../../../utils/UserService';
+import * as ImagePicker from 'expo-image-picker';
 
 export default function AccountScreen() {
   const [photoUri, setPhotoUri] = useState<string | null>(null);
-  const [userMail, setUserMail] = useState<string | null>(null);
-  const { user, logout } = useAuth();
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const { user, logout, updateUser, isLoading } = useAuth();
 
-  useFocusEffect(
-    useCallback(() => {
-      const loadUserData = async () => {
-        try {
-          // Intenta obtener el usuario actual guardado
-          const userData = await AsyncStorage.getItem('@movan_current_user');
-          if (userData) {
-            const user = JSON.parse(userData);
-            setUserMail(user.email);
-          } else {
-            // Si no hay usuario actual, intenta obtener el mail suelto
-            const mail = await AsyncStorage.getItem('mail');
-            setUserMail(mail);
-          }
-        } catch (error) {
-          setUserMail(null);
+  // Cargar usuario directamente desde AsyncStorage
+  useEffect(() => {
+    const loadUserData = async () => {
+      try {
+        // Intentar obtener desde AuthContext primero
+        if (user) {
+          setCurrentUser(user);
+          console.log('✅ Usando usuario de AuthContext:', user);
+          return;
         }
-      };
-      loadUserData();
-    }, [])
-  );
 
-  // Datos de ejemplo del usuario
-  const userInfo = {
-    name: "Juan Pérez",
-    email: userMail || "error",
-    role: "Transportista Privado",
-    phone: "+52 123 456 7890",
-    joinDate: "Enero 2024",
-    rating: 4.8,
-    completedDeliveries: 156
-  };
+        // Si no hay usuario en AuthContext, obtener directamente desde UserService
+        const userData = await UserService.getCurrentUser();
+        if (userData) {
+          setCurrentUser(userData);
+          console.log('✅ Usuario cargado desde UserService:', userData);
+        } else {
+          console.log('❌ No se pudo cargar el usuario');
+        }
+      } catch (error) {
+        console.error('Error loading user data:', error);
+      }
+    };
 
+    loadUserData();
+  }, [user]);
+
+  // Debug: verificar datos del usuario
+  useEffect(() => {
+    console.log('🔍 Usuario actual:', currentUser);
+    console.log('🔍 Usuario en AuthContext:', user);
+  }, [currentUser, user]);
+
+  // Cargar foto de perfil guardada
   useFocusEffect(
     useCallback(() => {
       const loadPhoto = async () => {
         try {
-          const uri = await AsyncStorage.getItem('lastPhoto');
-          if (uri) setPhotoUri(uri);
+          const userToUse = currentUser || user;
+          const savedPhoto = await AsyncStorage.getItem(`@profile_photo_${userToUse?.id}`);
+          if (savedPhoto) {
+            setPhotoUri(savedPhoto);
+          }
         } catch (error) {
-          console.error('Error loading photo from AsyncStorage', error);
+          console.error('Error loading profile photo:', error);
         }
       };
-
-      loadPhoto();
-    }, [])
+      
+      const userToUse = currentUser || user;
+      if (userToUse?.id) {
+        loadPhoto();
+      }
+    }, [currentUser?.id, user?.id])
   );
+
+  // Función para seleccionar y cambiar la foto de perfil
+  const changeProfilePhoto = async () => {
+    try {
+      // Solicitar permisos
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      
+      if (status !== 'granted') {
+        Alert.alert('Permisos requeridos', 'Necesitamos acceso a tu galería para cambiar la foto de perfil.');
+        return;
+      }
+
+      // Mostrar opciones
+      Alert.alert(
+        'Cambiar foto de perfil',
+        'Selecciona una opción',
+        [
+          {
+            text: 'Cámara',
+            onPress: () => openCamera(),
+          },
+          {
+            text: 'Galería',
+            onPress: () => openGallery(),
+          },
+          {
+            text: 'Cancelar',
+            style: 'cancel',
+          },
+        ]
+      );
+    } catch (error) {
+      console.error('Error requesting permissions:', error);
+      Alert.alert('Error', 'No se pudieron solicitar los permisos necesarios.');
+    }
+  };
+
+  const openCamera = async () => {
+    try {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      
+      if (status !== 'granted') {
+        Alert.alert('Permisos requeridos', 'Necesitamos acceso a la cámara para tomar una foto.');
+        return;
+      }
+
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled) {
+        await saveProfilePhoto(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error('Error opening camera:', error);
+      Alert.alert('Error', 'No se pudo abrir la cámara.');
+    }
+  };
+
+  const openGallery = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled) {
+        await saveProfilePhoto(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error('Error opening gallery:', error);
+      Alert.alert('Error', 'No se pudo abrir la galería.');
+    }
+  };
+
+  const saveProfilePhoto = async (uri: string) => {
+    try {
+      const userToUse = currentUser || user;
+      if (userToUse?.id) {
+        await AsyncStorage.setItem(`@profile_photo_${userToUse.id}`, uri);
+        setPhotoUri(uri);
+        Alert.alert('Éxito', 'Foto de perfil actualizada correctamente.');
+      }
+    } catch (error) {
+      console.error('Error saving profile photo:', error);
+      Alert.alert('Error', 'No se pudo guardar la foto de perfil.');
+    }
+  };
+
+  // Función para obtener el nombre completo del usuario
+  const getUserDisplayName = () => {
+    const userToUse = currentUser || user;
+    console.log('👤 Getting display name for user:', userToUse?.name, userToUse?.email);
+    if (userToUse?.name && userToUse.name.trim()) {
+      return userToUse.name;
+    }
+    // Si no tiene nombre, usar la parte antes del @ del email
+    if (userToUse?.email) {
+      return userToUse.email.split('@')[0];
+    }
+    return 'Usuario';
+  };
+
+  // Función para obtener el rol en español
+  const getUserRole = () => {
+    const userToUse = currentUser || user;
+    console.log('🎭 Getting role for user:', userToUse?.role);
+    switch (userToUse?.role) {
+      case 'Private':
+        return 'Transportista Privado';
+      case 'Particular':
+        return 'Usuario Particular';
+      default:
+        return 'Usuario';
+    }
+  };
+
+  // Función para formatear la fecha de registro
+  const getJoinDate = () => {
+    try {
+      const userToUse = currentUser || user;
+      // Si el usuario tiene una fecha de creación, usarla
+      if (userToUse && 'createdAt' in userToUse) {
+        const date = new Date(userToUse.createdAt as string);
+        return date.toLocaleDateString('es-ES', { 
+          year: 'numeric', 
+          month: 'long' 
+        });
+      }
+      // Si no, usar la fecha actual como ejemplo
+      return 'Junio 2025';
+    } catch (error) {
+      return 'Fecha no disponible';
+    }
+  };
+
+  // Función para obtener el teléfono del usuario
+  const getUserPhone = () => {
+    const userToUse = currentUser || user;
+    if (userToUse?.phone) {
+      return userToUse.phone;
+    }
+    return 'No registrado';
+  };
+
+  // Función para forzar la carga de datos si no están disponibles
+  const ensureUserHasData = async () => {
+    if (user && (!user.name || !user.role)) {
+      console.log('⚠️ Usuario sin datos completos, intentando recargar...');
+      // Recargar usuario desde storage
+      const currentUser = await UserService.getCurrentUser();
+      if (currentUser && (currentUser.name || currentUser.role)) {
+        console.log('✅ Datos recargados:', currentUser);
+        updateUser(currentUser);
+      }
+    }
+  };
+
+  // Ejecutar al montar el componente
+  useEffect(() => {
+    if (user) {
+      ensureUserHasData();
+    }
+  }, [user?.id]);
+
+  // Datos del usuario desde el contexto
+  const userInfo = {
+    name: getUserDisplayName(),
+    email: (currentUser || user)?.email || 'No disponible',
+    role: getUserRole(),
+    phone: getUserPhone(),
+    joinDate: getJoinDate(),
+    rating: 'Proximamente', // Estos pueden ser calculados basado en datos reales
+    completedDeliveries: 0 // Puede ser calculado desde datos de transportista
+  };
+
+  console.log('📊 UserInfo final:', userInfo);
+
+  const handleEditProfilePhoto = () => {
+    changeProfilePhoto();
+  };
 
   return (
     <SafeAreaView style={styles.background}>
@@ -68,15 +263,25 @@ export default function AccountScreen() {
         <Text style={styles.textabove}>Tu Cuenta</Text>
       </View>
 
-      <ScrollView style={styles.container}>
+      {isLoading ? (
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Cargando datos...</Text>
+        </View>
+      ) : (
+        <ScrollView style={styles.container}>
         <View style={styles.profileSection}>
-          {photoUri ? (
-            <Image source={{ uri: photoUri }} style={styles.avatar} />
-          ) : (
-            <View style={styles.placeholder}>
-              <MaterialCommunityIcons name="account" size={80} color="#666" />
+          <TouchableOpacity onPress={handleEditProfilePhoto} style={styles.avatarContainer}>
+            {photoUri ? (
+              <Image source={{ uri: photoUri }} style={styles.avatar} />
+            ) : (
+              <View style={styles.placeholder}>
+                <MaterialCommunityIcons name="account" size={80} color="#666" />
+              </View>
+            )}
+            <View style={styles.editIconContainer}>
+              <MaterialCommunityIcons name="camera" size={20} color="white" />
             </View>
-          )}
+          </TouchableOpacity>
           
           <View style={styles.userInfo}>
             <Text style={styles.userName}>{userInfo.name}</Text>
@@ -146,7 +351,8 @@ export default function AccountScreen() {
           <MaterialCommunityIcons name="logout" size={24} color="white" />
           <Text style={styles.logoutButtonText}>Cerrar Sesión</Text>
         </TouchableOpacity>
-      </ScrollView>
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 }
@@ -155,6 +361,18 @@ const styles = StyleSheet.create({
   background:{
     backgroundColor: '#262E93',
     flex: 1
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#565EB3',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  loadingText: {
+    color: 'white',
+    fontSize: 18,
   },
   userdetails:{
     alignItems: 'center',
@@ -174,6 +392,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: moderateScale(20),
   },
+  avatarContainer: {
+    position: 'relative',
+  },
   avatar: {
     width: moderateScale(120),
     height: moderateScale(120),
@@ -188,6 +409,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#ccc',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  editIconContainer: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: '#262E93',
+    borderRadius: moderateScale(15),
+    width: moderateScale(30),
+    height: moderateScale(30),
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'white',
   },
   userInfo: {
     alignItems: 'center',

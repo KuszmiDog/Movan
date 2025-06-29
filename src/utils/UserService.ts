@@ -5,6 +5,7 @@ export interface User {
   email: string;
   password: string;
   name?: string;
+  phone?: string;
   role?: 'Private' | 'Particular';
   isOnboardingComplete?: boolean;
   createdAt: string;
@@ -231,10 +232,18 @@ export class UserService {
   }
 
   // Obtener usuario actual
+  // Obtener usuario actual por ID
   static async getCurrentUser(): Promise<User | null> {
     try {
       const userData = await AsyncStorage.getItem(CURRENT_USER_KEY);
-      return userData ? JSON.parse(userData) : null;
+      if (userData) {
+        const user = JSON.parse(userData);
+        // Obtener datos actualizados del usuario desde la lista de usuarios
+        const users = await this.getUsers();
+        const currentUser = users.find(u => u.id === user.id);
+        return currentUser || user; // Fallback al usuario guardado si no se encuentra en la lista
+      }
+      return null;
     } catch (error) {
       console.error('Error obteniendo usuario actual:', error);
       return null;

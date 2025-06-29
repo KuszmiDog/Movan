@@ -1,21 +1,50 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { moderateScale, verticalScale } from 'react-native-size-matters';
 import { router } from 'expo-router';
+import { useAuth } from '../../../utils/AuthContext';
 
 const EditProfile = () => {
+  const { user, updateUser } = useAuth();
+  
   const [userInfo, setUserInfo] = useState({
-    name: "Juan Pérez",
-    email: "juan.perez@email.com",
-    phone: "+52 123 456 7890",
+    name: user?.name || '',
+    email: user?.email || '',
+    phone: user?.phone || '',
   });
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSave = () => {
-    // Aquí iría la lógica para guardar los cambios
-    console.log('Guardando cambios:', userInfo);
-    router.back(); // Volver a la pantalla anterior
+  const handleSave = async () => {
+    if (!userInfo.name.trim()) {
+      Alert.alert('Error', 'El nombre es obligatorio');
+      return;
+    }
+
+    if (!userInfo.email.trim()) {
+      Alert.alert('Error', 'El correo electrónico es obligatorio');
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      await updateUser({
+        name: userInfo.name.trim(),
+        email: userInfo.email.trim(),
+        phone: userInfo.phone.trim() || undefined,
+      });
+      
+      Alert.alert('Éxito', 'Perfil actualizado correctamente', [
+        { text: 'OK', onPress: () => router.back() }
+      ]);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      Alert.alert('Error', 'No se pudo actualizar el perfil');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -63,8 +92,14 @@ const EditProfile = () => {
           />
         </View>
 
-        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-          <Text style={styles.saveButtonText}>Guardar Cambios</Text>
+        <TouchableOpacity 
+          style={[styles.saveButton, isLoading && styles.saveButtonDisabled]} 
+          onPress={handleSave}
+          disabled={isLoading}
+        >
+          <Text style={styles.saveButtonText}>
+            {isLoading ? 'Guardando...' : 'Guardar Cambios'}
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -113,6 +148,10 @@ const styles = StyleSheet.create({
     borderRadius: moderateScale(10),
     alignItems: 'center',
     marginTop: verticalScale(20),
+  },
+  saveButtonDisabled: {
+    backgroundColor: '#999',
+    opacity: 0.6,
   },
   saveButtonText: {
     color: 'white',

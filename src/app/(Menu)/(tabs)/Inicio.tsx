@@ -75,7 +75,6 @@ const MovanMenu = () => {
     enviosHoy: 3,
     calificacionPromedio: 4.8,
     gananciasHoy: '$2,400',
-    gananciasSemana: '$15,400'
   };
 
   const onRefresh = async () => {

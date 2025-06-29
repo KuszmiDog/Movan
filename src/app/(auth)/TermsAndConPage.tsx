@@ -20,24 +20,24 @@ const TermsAndC = () => {
       setIsLoading(true);
     }, 3000);
   })
-  
+
   return (
-    
+
     <SafeAreaView style={styles.container} >
-        <View style={styles.movanlogo}>
-          <Image source={imagePath.iconMovan} style={styles.logoimage}/>
-          <Text style={styles.textLogo}>Transportá. Conectá. Mové.</Text>  
-        </View>
+      <View style={styles.movanlogo}>
+        <Image source={imagePath.iconMovan} style={styles.logoimage} />
+        <Text style={styles.textLogo}>Transportá. Conectá. Mové.</Text>
+      </View>
 
-        <View>
-          <TermsAndCon/>
-        </View>
+      <View>
+        <TermsAndCon />
+      </View>
 
-        <View style={styles.mApacheLogo}>
-          <Image source={imagePath.iconMApache} style={styles.mApacheLogoImage}/>
-          <Text style={styles.mApacheFont}>from mApache</Text>
-        </View>
-        
+      <View style={styles.mApacheLogo}>
+        <Image source={imagePath.iconMApache} style={styles.mApacheLogoImage} />
+        <Text style={styles.mApacheFont}>from mApache</Text>
+      </View>
+
     </SafeAreaView>
   )
 }

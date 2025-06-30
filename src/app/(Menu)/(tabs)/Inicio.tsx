@@ -185,6 +185,18 @@ const MovanMenu = () => {
               longitude: pedido.origen.coordenadas.lng,
               address: pedido.origen.direccion
             });
+            
+            // Mostrar alerta y navegar
+            Alert.alert(
+              '¡Pedido Aceptado!', 
+              'Te dirigiremos al mapa para navegar hacia el punto de recogida.',
+              [
+                {
+                  text: 'Ir al Mapa',
+                  onPress: () => router.push('/Buscar')
+                }
+              ]
+            );
           }
         }
       ]
@@ -723,7 +735,7 @@ const MovanMenu = () => {
                             };
                         
                         setDestinoNavegacion(destino);
-                        router.push('/(Menu)/(tabs)/Buscar');
+                        router.push('/Buscar');
                       }}
                     >
                       <MaterialCommunityIcons name="navigation" size={20} color="white" />

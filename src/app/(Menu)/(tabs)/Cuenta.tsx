@@ -19,7 +19,7 @@ export default function AccountScreen() {
   const [phone, setPhone] = useState<string | null>(null);
   const { user, logout, updateUser, isLoading } = useAuth();
 
-  // Cargar usuario directamente desde AsyncStorage
+  // Cargar usuario directamente desde AsyncStorage - Solo una vez al montar
   useEffect(() => {
     const loadUserData = async () => {
       try {
@@ -43,23 +43,30 @@ export default function AccountScreen() {
       }
     };
 
-    loadUserData();
-  }, [user]);
+    // Solo cargar si no tenemos usuario actual
+    if (!currentUser) {
+      loadUserData();
+    }
+  }, [user?.id]); // Solo depender del ID para evitar bucles
 
-  // Debug: verificar datos del usuario
+  // Debug: verificar datos del usuario - Solo en desarrollo
   useEffect(() => {
-    console.log('🔍 Usuario actual:', currentUser);
-    console.log('🔍 Usuario en AuthContext:', user);
-  }, [currentUser, user]);
+    if (__DEV__) {
+      console.log('🔍 Usuario actual:', currentUser);
+      console.log('🔍 Usuario en AuthContext:', user);
+    }
+  }, [currentUser?.id, user?.id]); // Solo depender de IDs
 
-  // Cargar foto de perfil guardada
+  // Cargar foto de perfil guardada - optimizado para evitar re-renders innecesarios
   useFocusEffect(
     useCallback(() => {
       const loadPhoto = async () => {
         try {
           const userToUse = currentUser || user;
-          const savedPhoto = await AsyncStorage.getItem(`@profile_photo_${userToUse?.id}`);
-          if (savedPhoto) {
+          if (!userToUse?.id) return;
+          
+          const savedPhoto = await AsyncStorage.getItem(`@profile_photo_${userToUse.id}`);
+          if (savedPhoto && savedPhoto !== photoUri) {
             setPhotoUri(savedPhoto);
           }
         } catch (error) {
@@ -71,7 +78,7 @@ export default function AccountScreen() {
       if (userToUse?.id) {
         loadPhoto();
       }
-    }, [currentUser?.id, user?.id])
+    }, [currentUser?.id, user?.id, photoUri]) // Incluir photoUri para evitar sets innecesarios
   );
 
   // Función para seleccionar y cambiar la foto de perfil
@@ -170,7 +177,9 @@ export default function AccountScreen() {
   // Función para obtener el nombre completo del usuario
   const getUserDisplayName = () => {
     const userToUse = currentUser || user;
-    console.log('👤 Getting display name for user:', userToUse?.name, userToUse?.email);
+    if (__DEV__) {
+      console.log('👤 Getting display name for user:', userToUse?.name, userToUse?.email);
+    }
     if (userToUse?.name && userToUse.name.trim()) {
       return userToUse.name;
     }
@@ -184,7 +193,9 @@ export default function AccountScreen() {
   // Función para obtener el rol en español
   const getUserRole = () => {
     const userToUse = currentUser || user;
-    console.log('🎭 Getting role for user:', userToUse?.role);
+    if (__DEV__) {
+      console.log('🎭 Getting role for user:', userToUse?.role);
+    }
     switch (userToUse?.role) {
       case 'Private':
         return 'Transportista Privado';
@@ -223,25 +234,25 @@ export default function AccountScreen() {
     return 'No registrado (Dirigase a Ajustes para agregar)';
   };
 
-  // Función para forzar la carga de datos si no están disponibles
-  const ensureUserHasData = async () => {
-    if (user && (!user.name || !user.role)) {
-      console.log('⚠️ Usuario sin datos completos, intentando recargar...');
-      // Recargar usuario desde storage
-      const currentUser = await UserService.getCurrentUser();
-      if (currentUser && (currentUser.name || currentUser.role)) {
-        console.log('✅ Datos recargados:', currentUser);
-        updateUser(currentUser);
-      }
-    }
-  };
+  // Función para forzar la carga de datos si no están disponibles - Removido para evitar bucles
+  // const ensureUserHasData = async () => {
+  //   if (user && (!user.name || !user.role)) {
+  //     console.log('⚠️ Usuario sin datos completos, intentando recargar...');
+  //     // Recargar usuario desde storage
+  //     const currentUser = await UserService.getCurrentUser();
+  //     if (currentUser && (currentUser.name || currentUser.role)) {
+  //       console.log('✅ Datos recargados:', currentUser);
+  //       updateUser(currentUser);
+  //     }
+  //   }
+  // };
 
-  // Ejecutar al montar el componente
-  useEffect(() => {
-    if (user) {
-      ensureUserHasData();
-    }
-  }, [user?.id]);
+  // Ejecutar al montar el componente - Removido para evitar bucles
+  // useEffect(() => {
+  //   if (user) {
+  //     ensureUserHasData();
+  //   }
+  // }, [user?.id]);
 
   // Datos del usuario desde el contexto
   const userInfo = {
@@ -254,7 +265,9 @@ export default function AccountScreen() {
     completedDeliveries: 0 // Puede ser calculado desde datos de transportista
   };
 
-  console.log('📊 UserInfo final:', userInfo);
+  if (__DEV__) {
+    console.log('📊 UserInfo final:', userInfo);
+  }
 
   const handleEditProfilePhoto = () => {
     changeProfilePhoto();
@@ -281,7 +294,7 @@ export default function AccountScreen() {
         <Text style={styles.textabove}>Tu Cuenta</Text>
       </View>
 
-      {isLoading ? (
+      {(isLoading || (!currentUser && !user)) ? (
         <View style={styles.loadingContainer}>
           <Text style={styles.loadingText}>Cargando datos...</Text>
         </View>

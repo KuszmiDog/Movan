@@ -192,7 +192,7 @@ const MovanMenu = () => {
               [
                 {
                   text: 'Ir al Mapa',
-                  onPress: () => router.push('/(Menu)/(tabs)/Buscar')
+                  onPress: () => router.push('/Buscar')
                 }
               ]
             );
@@ -734,7 +734,7 @@ const MovanMenu = () => {
                             };
                         
                         setDestinoNavegacion(destino);
-                        router.push('/(Menu)/(tabs)/Buscar');
+                        router.push('/Buscar');
                       }}
                     >
                       <MaterialCommunityIcons name="navigation" size={20} color="white" />

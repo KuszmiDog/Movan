@@ -235,14 +235,29 @@ export class UserService {
   // Obtener usuario actual por ID
   static async getCurrentUser(): Promise<User | null> {
     try {
+      console.log('🔍 Buscando usuario actual...');
+      
       const userData = await AsyncStorage.getItem(CURRENT_USER_KEY);
+      console.log('📱 Datos de usuario desde storage:', userData);
+      
       if (userData) {
         const user = JSON.parse(userData);
+        console.log('👤 Usuario parseado:', user);
+        
         // Obtener datos actualizados del usuario desde la lista de usuarios
         const users = await this.getUsers();
+        console.log('📋 Total usuarios en lista:', users.length);
+        
         const currentUser = users.find(u => u.id === user.id);
-        return currentUser || user; // Fallback al usuario guardado si no se encuentra en la lista
+        console.log('🔍 Usuario encontrado en lista:', currentUser);
+        
+        const finalUser = currentUser || user; // Fallback al usuario guardado si no se encuentra en la lista
+        console.log('✅ Usuario final a retornar:', finalUser);
+        
+        return finalUser;
       }
+      
+      console.log('❌ No se encontraron datos de usuario en storage');
       return null;
     } catch (error) {
       console.error('Error obteniendo usuario actual:', error);

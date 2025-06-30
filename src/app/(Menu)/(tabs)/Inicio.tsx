@@ -1,5 +1,5 @@
 import 'react-native-get-random-values';
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, BackHandler, Alert, RefreshControl, TextInput, Modal } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { moderateScale, verticalScale } from 'react-native-size-matters';
@@ -9,6 +9,7 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Pedido } from '@/src/components/UserPosts/SimulatedPosts';
 import { pedidosSimulados } from '@/src/components/UserPosts/SimulatedPosts';
+import { SolicitudService } from '@/src/utils/SolicitudService';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import Constants from 'expo-constants';
 
@@ -17,7 +18,7 @@ const GOOGLE_MAPS_API_KEY = Constants.expoConfig?.extra?.GOOGLE_MAPS_API_KEY;
 type EstadoCamionero = 'disponible' | 'ocupado' | 'fuera_servicio';
 
 const MovanMenu = () => {
-  const { user } = useAuth();
+  const { user, debugAuthState, reloadUser } = useAuth();
   const { 
     setPedidoActivo: setPedidoActivoContext, 
     setDestinoNavegacion, 
@@ -81,9 +82,39 @@ const MovanMenu = () => {
     return () => backHandler.remove();
   }, []);
 
-  // Cargar pedidos disponibles (simulación)
+  // Forzar recarga del usuario al iniciar el componente
+  useEffect(() => {
+    console.log('🔄 Iniciando componente MovanMenu');
+    if (reloadUser) {
+      console.log('🔄 Forzando recarga del usuario...');
+      reloadUser();
+    }
+  }, []);
+
+  // Cargar pedidos disponibles (simulados + solicitudes reales)
   const cargarPedidosDisponibles = async () => {
-    setPedidosDisponibles(pedidosSimulados.filter(pedido => pedido.estado === 'disponible'));
+    try {
+      // Pedidos simulados
+      const pedidosSimuladosDisponibles = pedidosSimulados.filter(pedido => pedido.estado === 'disponible');
+      
+      // Solicitudes reales convertidas a pedidos
+      const solicitudesReales = await SolicitudService.getSolicitudesComoPedidos();
+      
+      // Combinar ambos
+      const todosPedidos = [...pedidosSimuladosDisponibles, ...solicitudesReales];
+      
+      console.log('📦 Pedidos cargados:', {
+        simulados: pedidosSimuladosDisponibles.length,
+        reales: solicitudesReales.length,
+        total: todosPedidos.length
+      });
+      
+      setPedidosDisponibles(todosPedidos);
+    } catch (error) {
+      console.error('Error cargando pedidos:', error);
+      // Fallback a solo pedidos simulados
+      setPedidosDisponibles(pedidosSimulados.filter(pedido => pedido.estado === 'disponible'));
+    }
   };
 
   useEffect(() => {
@@ -329,15 +360,20 @@ const MovanMenu = () => {
                 <GooglePlacesAutocomplete
                   placeholder="Buscar dirección de origen"
                   onPress={(data, details = null) => {
-                    const loc = details?.geometry.location;
-                    setNuevoPost({
-                      ...nuevoPost,
-                      origen: {
-                        direccion: data.description,
-                        coordenadas: { lat: loc.lat, lng: loc.lng }
-                      }
-                    });
-                    setShowOrigenModal(false);
+                    const loc = details?.geometry?.location;
+                    if (loc && loc.lat && loc.lng) {
+                      setNuevoPost({
+                        ...nuevoPost,
+                        origen: {
+                          direccion: data.description,
+                          coordenadas: { lat: loc.lat, lng: loc.lng }
+                        }
+                      });
+                      setShowOrigenModal(false);
+                    } else {
+                      console.error('No se pudieron obtener las coordenadas del origen');
+                      Alert.alert('Error', 'No se pudieron obtener las coordenadas de esta dirección');
+                    }
                   }}
                   fetchDetails
                   query={{
@@ -390,15 +426,20 @@ const MovanMenu = () => {
                 <GooglePlacesAutocomplete
                   placeholder="Buscar dirección de destino"
                   onPress={(data, details = null) => {
-                    const loc = details?.geometry.location;
-                    setNuevoPost({
-                      ...nuevoPost,
-                      destino: {
-                        direccion: data.description,
-                        coordenadas: { lat: loc.lat, lng: loc.lng }
-                      }
-                    });
-                    setShowDestinoModal(false);
+                    const loc = details?.geometry?.location;
+                    if (loc && loc.lat && loc.lng) {
+                      setNuevoPost({
+                        ...nuevoPost,
+                        destino: {
+                          direccion: data.description,
+                          coordenadas: { lat: loc.lat, lng: loc.lng }
+                        }
+                      });
+                      setShowDestinoModal(false);
+                    } else {
+                      console.error('No se pudieron obtener las coordenadas del destino');
+                      Alert.alert('Error', 'No se pudieron obtener las coordenadas de esta dirección');
+                    }
                   }}
                   fetchDetails
                   query={{
@@ -469,18 +510,75 @@ const MovanMenu = () => {
           </View>
           <TouchableOpacity
             style={[styles.navegarButton, { marginTop: 16 }]}
-            onPress={() => {
-              Alert.alert('¡Post creado!', 'Tu pedido fue creado correctamente.');
-              setStep(1);
-              setNuevoPost({
-                tipo: '',
-                peso: '',
-                descripcion: '',
-                precio: '',
-                origen: { direccion: '', coordenadas: { lat: null, lng: null } },
-                destino: { direccion: '', coordenadas: { lat: null, lng: null } },
-                prioridad: 'normal',
-              });
+            onPress={async () => {
+              try {
+                if (!user) {
+                  Alert.alert('Error', 'No se encontró información del usuario');
+                  return;
+                }
+
+                // Validar coordenadas
+                if (!nuevoPost.origen.coordenadas.lat || !nuevoPost.origen.coordenadas.lng ||
+                    !nuevoPost.destino.coordenadas.lat || !nuevoPost.destino.coordenadas.lng) {
+                  Alert.alert('Error', 'Faltan coordenadas de origen o destino');
+                  return;
+                }
+
+                // Crear la solicitud
+                const result = await SolicitudService.crearSolicitud({
+                  clienteId: user.id,
+                  cliente: {
+                    nombre: user.name || user.email?.split('@')[0] || 'Usuario',
+                    telefono: user.phone || '+54 9 XXXX XXXX',
+                    calificacion: 5 // Valor por defecto
+                  },
+                  origen: {
+                    direccion: nuevoPost.origen.direccion,
+                    coordenadas: {
+                      lat: nuevoPost.origen.coordenadas.lat,
+                      lng: nuevoPost.origen.coordenadas.lng
+                    }
+                  },
+                  destino: {
+                    direccion: nuevoPost.destino.direccion,
+                    coordenadas: {
+                      lat: nuevoPost.destino.coordenadas.lat,
+                      lng: nuevoPost.destino.coordenadas.lng
+                    }
+                  },
+                  carga: {
+                    tipo: nuevoPost.tipo,
+                    peso: parseInt(nuevoPost.peso),
+                    descripcion: nuevoPost.descripcion
+                  },
+                  precio: parseInt(nuevoPost.precio),
+                  distancia: Math.round(Math.random() * 50 + 5), // Calcular distancia real después
+                  tiempoEstimado: Math.round(Math.random() * 120 + 30), // Calcular tiempo real después
+                  fechaRequerida: new Date(Date.now() + 24 * 60 * 60 * 1000), // Mañana por defecto
+                  prioridad: nuevoPost.prioridad as 'normal' | 'urgente'
+                });
+
+                if (result.success) {
+                  Alert.alert('¡Solicitud creada!', 'Tu solicitud fue creada correctamente y está disponible para transportistas.');
+                  
+                  // Resetear formulario
+                  setStep(1);
+                  setNuevoPost({
+                    tipo: '',
+                    peso: '',
+                    descripcion: '',
+                    precio: '',
+                    origen: { direccion: '', coordenadas: { lat: null, lng: null } },
+                    destino: { direccion: '', coordenadas: { lat: null, lng: null } },
+                    prioridad: 'normal',
+                  });
+                } else {
+                  Alert.alert('Error', result.message);
+                }
+              } catch (error) {
+                console.error('Error creando solicitud:', error);
+                Alert.alert('Error', 'Ocurrió un error al crear la solicitud');
+              }
             }}
           >
             <Text style={styles.navegarButtonText}>Crear Pedido</Text>
@@ -508,6 +606,29 @@ const MovanMenu = () => {
               month: 'long'
             })}
           </Text>
+          
+          {/* Botón temporal para debug de autenticación */}
+          {__DEV__ && (
+            <TouchableOpacity
+              style={{
+                backgroundColor: 'purple',
+                padding: 8,
+                borderRadius: 5,
+                marginTop: 10,
+                alignSelf: 'center'
+              }}
+              onPress={async () => {
+                console.log('🔧 DEBUG AUTH STATE COMPLETO:');
+                if (debugAuthState) {
+                  await debugAuthState();
+                } else {
+                  console.log('❌ debugAuthState no disponible');
+                }
+              }}
+            >
+              <Text style={{ color: 'white', fontSize: 12 }}>AUTH DEBUG</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {user?.role === 'Private' ? (

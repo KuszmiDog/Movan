@@ -21,6 +21,7 @@ interface AuthContextType {
   updateUser: (userData: Partial<User>) => Promise<void>;
   completeOnboarding: () => Promise<void>;
   reloadUser: () => Promise<void>;
+  debugAuthState?: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -66,13 +67,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         
         if (sessionAge < thirtyDays) {
           // Sesión válida, obtener datos del usuario
+          console.log('⏰ Sesión válida, obteniendo datos del usuario...');
           const currentUser = await UserService.getCurrentUser();
-          console.log('👤 Current user loaded:', currentUser);
+          console.log('👤 Current user loaded from UserService:', currentUser);
           
           if (currentUser) {
+            console.log('✅ Estableciendo usuario en contexto:', currentUser);
             setUser(currentUser);
             setIsAuthenticated(true);
-            console.log('✅ User authenticated:', currentUser.email);
+            console.log('✅ User authenticated:', currentUser.email, 'Role:', currentUser.role);
           } else {
             console.log('❌ User not found, clearing session');
             // Usuario no encontrado, limpiar sesión
@@ -202,6 +205,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  // Función de debug para verificar estado completo
+  const debugAuthState = async () => {
+    try {
+      console.log('🐛 === DEBUG AUTH STATE ===');
+      console.log('Usuario en estado:', user);
+      console.log('isAuthenticated:', isAuthenticated);
+      console.log('isLoading:', isLoading);
+      
+      // Verificar storage directo
+      const sessionData = await AsyncStorage.getItem('@auth_session');
+      console.log('Session storage:', sessionData);
+      
+      const currentUserData = await AsyncStorage.getItem('@movan_current_user');
+      console.log('Current user storage:', currentUserData);
+      
+      const usersData = await AsyncStorage.getItem('@movan_users');
+      console.log('Users storage:', usersData);
+      
+      // Intentar obtener usuario actual
+      const currentUser = await UserService.getCurrentUser();
+      console.log('getCurrentUser result:', currentUser);
+      
+      console.log('🐛 === END DEBUG ===');
+    } catch (error) {
+      console.error('Error en debug:', error);
+    }
+  };
+
   const completeOnboarding = async () => {
     try {
       if (user) {
@@ -226,6 +257,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     updateUser,
     completeOnboarding,
     reloadUser,
+    debugAuthState,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

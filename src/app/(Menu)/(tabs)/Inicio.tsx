@@ -273,7 +273,7 @@ const MovanMenu = () => {
   );
 
   const renderParticularUI = () => (
-    <View style={{ padding: 24 }}>
+    <View style={{ padding: 20, backgroundColor: '#262E93', borderRadius: 12, margin: 12 }}>
       <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold', marginBottom: 16 }}>
         ¡Bienvenido, {user?.name || user?.email?.split('@')[0] || 'Usuario'}!
       </Text>

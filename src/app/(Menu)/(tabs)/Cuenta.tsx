@@ -219,7 +219,7 @@ export default function AccountScreen() {
     if (userToUse?.phone) {
       return userToUse.phone;
     }
-    return 'No registrado';
+    return 'No registrado (Dirigase a Ajustes para agregar)';
   };
 
   // Función para forzar la carga de datos si no están disponibles
@@ -326,7 +326,7 @@ export default function AccountScreen() {
           </View>
           <View style={styles.infoItem}>
             <MaterialCommunityIcons name="phone" size={24} color="white" />
-            <Text style={styles.infoText}>{phone ? phone : 'No registrado'}</Text>
+            <Text style={styles.infoText}>{phone ? phone : 'No registrado (Dirijase a Ajustes)'}</Text>
           </View>
           <View style={styles.infoItem}>
             <MaterialCommunityIcons name="calendar" size={24} color="white" />

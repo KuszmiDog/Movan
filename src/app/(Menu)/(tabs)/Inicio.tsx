@@ -35,6 +35,7 @@ const MovanMenu = () => {
     tipo: string;
     peso: string;
     descripcion: string;
+    precio: string;
     origen: { direccion: string; coordenadas: { lat: number | null; lng: number | null } };
     destino: { direccion: string; coordenadas: { lat: number | null; lng: number | null } };
     prioridad: string;
@@ -42,6 +43,7 @@ const MovanMenu = () => {
     tipo: '',
     peso: '',
     descripcion: '',
+    precio: '',
     origen: { direccion: '', coordenadas: { lat: null, lng: null } },
     destino: { direccion: '', coordenadas: { lat: null, lng: null } },
     prioridad: 'normal',
@@ -277,10 +279,24 @@ const MovanMenu = () => {
             multiline
             placeholderTextColor="#aaa"
           />
+          <Text style={{ color: 'white', marginBottom: 8 }}>Precio ($)</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Ej: 1500"
+            value={nuevoPost.precio}
+            onChangeText={v => setNuevoPost({ ...nuevoPost, precio: v.replace(/[^0-9]/g, '') })}
+            keyboardType="numeric"
+            placeholderTextColor="#aaa"
+          />
           <TouchableOpacity
             style={[styles.navegarButton, { marginTop: 16 }]}
             onPress={() => setStep(2)}
-            disabled={!nuevoPost.tipo || !nuevoPost.peso || !nuevoPost.descripcion}
+            disabled={
+              !nuevoPost.tipo ||
+              !nuevoPost.peso ||
+              !nuevoPost.descripcion ||
+              !nuevoPost.precio
+            }
           >
             <Text style={styles.navegarButtonText}>Siguiente</Text>
           </TouchableOpacity>
@@ -460,6 +476,7 @@ const MovanMenu = () => {
                 tipo: '',
                 peso: '',
                 descripcion: '',
+                precio: '',
                 origen: { direccion: '', coordenadas: { lat: null, lng: null } },
                 destino: { direccion: '', coordenadas: { lat: null, lng: null } },
                 prioridad: 'normal',

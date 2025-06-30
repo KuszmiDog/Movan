@@ -6,6 +6,7 @@ import { moderateScale, verticalScale } from 'react-native-size-matters';
 import MovanMap from '@/src/components/atoms/MovanMap';
 import { usePedido } from '@/src/utils/PedidoContext';
 
+
 const Buscar = () => {
   const { 
     pedidoActivo, 

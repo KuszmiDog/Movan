@@ -6,6 +6,7 @@ export default function Layout() {
     <PedidoProvider>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="Buscar" options={{ headerShown: false }} />
       </Stack>
     </PedidoProvider>
   );

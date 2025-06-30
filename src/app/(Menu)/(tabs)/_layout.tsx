@@ -7,12 +7,12 @@ export const unstable_settings = {
 
 export default function TabLayout() {
   return (
-    <Tabs screenOptions={{ tabBarActiveTintColor: '#262E93' }}>
+    <Tabs screenOptions={{ tabBarActiveTintColor: '#262E93', headerShown: false }}>
       <Tabs.Screen
         name="Inicio"
         options={{
           title: 'Inicio',
-          tabBarIcon: ({ color }) => <FontAwesome size={28} name="home" color={color} />,
+          tabBarIcon: ({ color }) => <FontAwesome size={28} name="home" color={color} />
         }}
       />
       <Tabs.Screen

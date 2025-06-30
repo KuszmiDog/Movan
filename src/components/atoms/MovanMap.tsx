@@ -7,6 +7,7 @@ import { markers } from '@/src/assets/markers/marker';
 import MapViewDirections from 'react-native-maps-directions';
 import Constants from 'expo-constants';
 import { usePedido } from '@/src/utils/PedidoContext';
+import { useAuth } from '@/src/utils/AuthContext'; // Ajusta el path si es necesario
 
 const GOOGLE_MAPS_API_KEY = Constants.expoConfig?.extra?.GOOGLE_MAPS_API_KEY;
 
@@ -28,6 +29,7 @@ export default function MovanMap() {
   
   // Usar el contexto de pedidos
   const { destinoNavegacion, pedidoActivo, estadoPedido } = usePedido();
+  const { user } = useAuth(); // Obtén el usuario autenticado
 
   // permiso para la ubicacion
   useEffect(() => {
@@ -153,7 +155,8 @@ export default function MovanMap() {
         showsMyLocationButton={true}
         ref={mapRef}
       >
-        {markers.map((marker, index) => (
+        {/* Solo muestra los markers si el usuario NO es 'Particular' */}
+        {user?.role !== 'Particular' && markers.map((marker, index) => (
           <Marker
             key={index}
             coordinate={{

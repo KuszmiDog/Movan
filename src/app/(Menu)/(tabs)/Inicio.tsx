@@ -225,7 +225,7 @@ const MovanMenu = () => {
         {/* Header con saludo personalizado */}
         <View style={styles.header}>
           <Text style={styles.welcomeText}>
-            ¡Hola, {user?.name || user?.email?.split('@')[0] || 'Transportista'}!
+            ¡Hola, {user?.name || user?.email?.split('@')[0] || 'Usuario'}!
           </Text>
           <Text style={styles.dateText}>
             {new Date().toLocaleDateString('es-ES', { 
@@ -236,173 +236,189 @@ const MovanMenu = () => {
           </Text>
         </View>
 
-        {/* Estado del camionero */}
-        <TouchableOpacity style={styles.estadoContainer} onPress={cambiarEstado}>
-          <View style={[styles.estadoIndicador, { backgroundColor: getEstadoColor() }]} />
-          <Text style={styles.estadoTexto}>{getEstadoTexto()}</Text>
-          <MaterialCommunityIcons name="chevron-down" size={20} color="white" />
-        </TouchableOpacity>
+        {/* Renderiza según el rol */}
+        {user?.role === 'Private' ? (
+          <>
+            {/* Estado del camionero */}
+            <TouchableOpacity style={styles.estadoContainer} onPress={cambiarEstado}>
+              <View style={[styles.estadoIndicador, { backgroundColor: getEstadoColor() }]} />
+              <Text style={styles.estadoTexto}>{getEstadoTexto()}</Text>
+              <MaterialCommunityIcons name="chevron-down" size={20} color="white" />
+            </TouchableOpacity>
 
-        {/* Estadísticas del día */}
-        <View style={styles.statsContainer}>
-          <View style={styles.statCard}>
-            <MaterialCommunityIcons name="truck-delivery" size={28} color="white" />
-            <Text style={styles.statNumber}>{stats.enviosHoy}</Text>
-            <Text style={styles.statLabel}>Envíos Hoy</Text>
-          </View>
-
-          <View style={styles.statCard}>
-            <MaterialCommunityIcons name="cash" size={28} color="white" />
-            <Text style={styles.statNumber}>{stats.gananciasHoy}</Text>
-            <Text style={styles.statLabel}>Ganancia Hoy</Text>
-          </View>
-        </View>
-
-        {/* Pedido activo si existe */}
-        {pedidoActivo && (
-          <View style={styles.pedidoActivoContainer}>
-            <Text style={styles.sectionTitle}>🚛 Pedido Activo</Text>
-            <View style={styles.pedidoActivoCard}>
-              {/* Header con información del cliente y estado */}
-              <View style={styles.pedidoActivoHeader}>
-                <View style={styles.clienteActivoInfo}>
-                  <Text style={styles.clienteActivoNombre}>{pedidoActivo.cliente.nombre}</Text>
-                  <View style={styles.calificacionContainer}>
-                    <MaterialCommunityIcons name="star" size={16} color="#FFD700" />
-                    <Text style={styles.calificacionActivo}>{pedidoActivo.cliente.calificacion}</Text>
-                  </View>
-                </View>
-                <Text style={styles.estadoPedidoTexto}>
-                  {estadoPedido === 'recogiendo' ? 'Dirigiéndose a recoger' : 
-                   estadoPedido === 'recogido' ? 'Dirigiéndose a entregar' : 
-                   'En proceso'}
-                </Text>
+            {/* Estadísticas del día */}
+            <View style={styles.statsContainer}>
+              <View style={styles.statCard}>
+                <MaterialCommunityIcons name="truck-delivery" size={28} color="white" />
+                <Text style={styles.statNumber}>{stats.enviosHoy}</Text>
+                <Text style={styles.statLabel}>Envíos Hoy</Text>
               </View>
 
-              {/* Información de la ruta */}
-              <View style={styles.rutaActivaContainer}>
-                <View style={styles.direccionRow}>
-                  <MaterialCommunityIcons 
-                    name="map-marker" 
-                    size={20} 
-                    color={estadoPedido === 'recogiendo' ? "#FF6B35" : "#4CAF50"} 
-                  />
-                  <View style={styles.direccionInfo}>
-                    <Text style={styles.direccionLabel}>Origen</Text>
-                    <Text style={styles.direccionTexto}>{pedidoActivo.origen.direccion}</Text>
-                  </View>
-                </View>
-                
-                <View style={styles.separadorRuta}>
-                  <MaterialCommunityIcons name="arrow-down" size={20} color="rgba(255,255,255,0.6)" />
-                </View>
-                
-                <View style={styles.direccionRow}>
-                  <MaterialCommunityIcons 
-                    name="map-marker-check" 
-                    size={20} 
-                    color={estadoPedido === 'recogido' ? "#FF6B35" : "#F44336"} 
-                  />
-                  <View style={styles.direccionInfo}>
-                    <Text style={styles.direccionLabel}>Destino</Text>
-                    <Text style={styles.direccionTexto}>{pedidoActivo.destino.direccion}</Text>
-                  </View>
-                </View>
+              <View style={styles.statCard}>
+                <MaterialCommunityIcons name="cash" size={28} color="white" />
+                <Text style={styles.statNumber}>{stats.gananciasHoy}</Text>
+                <Text style={styles.statLabel}>Ganancia Hoy</Text>
               </View>
+            </View>
 
-              {/* Detalles del pedido */}
-              <View style={styles.detallesActivoContainer}>
-                <View style={styles.detalleActivo}>
-                  <MaterialCommunityIcons name="package-variant" size={18} color="rgba(255,255,255,0.8)" />
-                  <Text style={styles.detalleActivoTexto}>{pedidoActivo.carga.tipo} ({pedidoActivo.carga.peso}kg)</Text>
-                </View>
-                <View style={styles.detalleActivo}>
-                  <MaterialCommunityIcons name="map" size={18} color="rgba(255,255,255,0.8)" />
-                  <Text style={styles.detalleActivoTexto}>{pedidoActivo.distancia}km • {Math.round(pedidoActivo.tiempoEstimado/60)}h</Text>
-                </View>
-                <View style={styles.detalleActivo}>
-                  <MaterialCommunityIcons name="cash" size={18} color="rgba(255,255,255,0.8)" />
-                  <Text style={styles.pagoTexto}>${pedidoActivo.precio}</Text>
-                </View>
-              </View>
+            {/* Pedido activo si existe */}
+            {pedidoActivo && (
+              <View style={styles.pedidoActivoContainer}>
+                <Text style={styles.sectionTitle}>🚛 Pedido Activo</Text>
+                <View style={styles.pedidoActivoCard}>
+                  {/* Header con información del cliente y estado */}
+                  <View style={styles.pedidoActivoHeader}>
+                    <View style={styles.clienteActivoInfo}>
+                      <Text style={styles.clienteActivoNombre}>{pedidoActivo.cliente.nombre}</Text>
+                      <View style={styles.calificacionContainer}>
+                        <MaterialCommunityIcons name="star" size={16} color="#FFD700" />
+                        <Text style={styles.calificacionActivo}>{pedidoActivo.cliente.calificacion}</Text>
+                      </View>
+                    </View>
+                    <Text style={styles.estadoPedidoTexto}>
+                      {estadoPedido === 'recogiendo' ? 'Dirigiéndose a recoger' : 
+                      estadoPedido === 'recogido' ? 'Dirigiéndose a entregar' : 
+                      'En proceso'}
+                    </Text>
+                  </View>
 
-              {/* Botones de acción */}
-              <View style={styles.botonesContainer}>
-                <TouchableOpacity 
-                  style={styles.navegarButton}
-                  onPress={() => {
-                    const destino = estadoPedido === 'recogiendo' 
-                      ? {
-                          latitude: pedidoActivo.origen.coordenadas.lat,
-                          longitude: pedidoActivo.origen.coordenadas.lng,
-                          address: pedidoActivo.origen.direccion
-                        }
-                      : {
-                          latitude: pedidoActivo.destino.coordenadas.lat,
-                          longitude: pedidoActivo.destino.coordenadas.lng,
-                          address: pedidoActivo.destino.direccion
-                        };
+                  {/* Información de la ruta */}
+                  <View style={styles.rutaActivaContainer}>
+                    <View style={styles.direccionRow}>
+                      <MaterialCommunityIcons 
+                        name="map-marker" 
+                        size={20} 
+                        color={estadoPedido === 'recogiendo' ? "#FF6B35" : "#4CAF50"} 
+                      />
+                      <View style={styles.direccionInfo}>
+                        <Text style={styles.direccionLabel}>Origen</Text>
+                        <Text style={styles.direccionTexto}>{pedidoActivo.origen.direccion}</Text>
+                      </View>
+                    </View>
                     
-                    setDestinoNavegacion(destino);
-                    router.push('/(Menu)/(tabs)/Buscar');
-                  }}
-                >
-                  <MaterialCommunityIcons name="navigation" size={20} color="white" />
-                  <Text style={styles.navegarButtonText}>
-                    {estadoPedido === 'recogiendo' ? 'Ir a Recoger' : 'Ir a Entregar'}
-                  </Text>
-                </TouchableOpacity>
+                    <View style={styles.separadorRuta}>
+                      <MaterialCommunityIcons name="arrow-down" size={20} color="rgba(255,255,255,0.6)" />
+                    </View>
+                    
+                    <View style={styles.direccionRow}>
+                      <MaterialCommunityIcons 
+                        name="map-marker-check" 
+                        size={20} 
+                        color={estadoPedido === 'recogido' ? "#FF6B35" : "#F44336"} 
+                      />
+                      <View style={styles.direccionInfo}>
+                        <Text style={styles.direccionLabel}>Destino</Text>
+                        <Text style={styles.direccionTexto}>{pedidoActivo.destino.direccion}</Text>
+                      </View>
+                    </View>
+                  </View>
 
-                <TouchableOpacity 
-                  style={styles.cancelarButton}
-                  onPress={() => {
-                    Alert.alert(
-                      'Cancelar Pedido',
-                      '¿Estás seguro de que quieres cancelar este pedido?',
-                      [
-                        { text: 'No', style: 'cancel' },
-                        {
-                          text: 'Sí, Cancelar',
-                          style: 'destructive',
-                          onPress: () => {
-                            setPedidoActivoContext(null);
-                            setEstadoPedido(null);
-                            setDestinoNavegacion(null);
-                            setPedidoActivo(null);
-                            setEstadoCamionero('disponible');
-                          }
-                        }
-                      ]
-                    );
-                  }}
-                >
-                  <MaterialCommunityIcons name="close" size={20} color="white" />
-                  <Text style={styles.cancelarButtonText}>Cancelar</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        )}
+                  {/* Detalles del pedido */}
+                  <View style={styles.detallesActivoContainer}>
+                    <View style={styles.detalleActivo}>
+                      <MaterialCommunityIcons name="package-variant" size={18} color="rgba(255,255,255,0.8)" />
+                      <Text style={styles.detalleActivoTexto}>{pedidoActivo.carga.tipo} ({pedidoActivo.carga.peso}kg)</Text>
+                    </View>
+                    <View style={styles.detalleActivo}>
+                      <MaterialCommunityIcons name="map" size={18} color="rgba(255,255,255,0.8)" />
+                      <Text style={styles.detalleActivoTexto}>{pedidoActivo.distancia}km • {Math.round(pedidoActivo.tiempoEstimado/60)}h</Text>
+                    </View>
+                    <View style={styles.detalleActivo}>
+                      <MaterialCommunityIcons name="cash" size={18} color="rgba(255,255,255,0.8)" />
+                      <Text style={styles.pagoTexto}>${pedidoActivo.precio}</Text>
+                    </View>
+                  </View>
 
-        {/* Pedidos disponibles */}
-        {estadoCamionero === 'disponible' && !pedidoActivo && (
-          <View style={styles.pedidosContainer}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>📦 Pedidos Disponibles</Text>
-              <TouchableOpacity onPress={onRefresh}>
-                <MaterialCommunityIcons name="refresh" size={24} color="white" />
-              </TouchableOpacity>
-            </View>
-            
-            {pedidosDisponibles.length > 0 ? (
-              pedidosDisponibles.map(renderPedidoCard)
-            ) : (
-              <View style={styles.noPedidosContainer}>
-                <MaterialCommunityIcons name="truck-outline" size={60} color="#666" />
-                <Text style={styles.noPedidosTexto}>No hay pedidos disponibles</Text>
-                <Text style={styles.noPedidosSubtexto}>Mantente conectado, pronto aparecerán nuevos pedidos</Text>
+                  {/* Botones de acción */}
+                  <View style={styles.botonesContainer}>
+                    <TouchableOpacity 
+                      style={styles.navegarButton}
+                      onPress={() => {
+                        const destino = estadoPedido === 'recogiendo' 
+                          ? {
+                              latitude: pedidoActivo.origen.coordenadas.lat,
+                              longitude: pedidoActivo.origen.coordenadas.lng,
+                              address: pedidoActivo.origen.direccion
+                            }
+                          : {
+                              latitude: pedidoActivo.destino.coordenadas.lat,
+                              longitude: pedidoActivo.destino.coordenadas.lng,
+                              address: pedidoActivo.destino.direccion
+                            };
+                        
+                        setDestinoNavegacion(destino);
+                        router.push('/(Menu)/(tabs)/Buscar');
+                      }}
+                    >
+                      <MaterialCommunityIcons name="navigation" size={20} color="white" />
+                      <Text style={styles.navegarButtonText}>
+                        {estadoPedido === 'recogiendo' ? 'Ir a Recoger' : 'Ir a Entregar'}
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity 
+                      style={styles.cancelarButton}
+                      onPress={() => {
+                        Alert.alert(
+                          'Cancelar Pedido',
+                          '¿Estás seguro de que quieres cancelar este pedido?',
+                          [
+                            { text: 'No', style: 'cancel' },
+                            {
+                              text: 'Sí, Cancelar',
+                              style: 'destructive',
+                              onPress: () => {
+                                setPedidoActivoContext(null);
+                                setEstadoPedido(null);
+                                setDestinoNavegacion(null);
+                                setPedidoActivo(null);
+                                setEstadoCamionero('disponible');
+                              }
+                            }
+                          ]
+                        );
+                      }}
+                    >
+                      <MaterialCommunityIcons name="close" size={20} color="white" />
+                      <Text style={styles.cancelarButtonText}>Cancelar</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
               </View>
             )}
+
+            {/* Pedidos disponibles */}
+            {estadoCamionero === 'disponible' && !pedidoActivo && (
+              <View style={styles.pedidosContainer}>
+                <View style={styles.sectionHeader}>
+                  <Text style={styles.sectionTitle}>📦 Pedidos Disponibles</Text>
+                  <TouchableOpacity onPress={onRefresh}>
+                    <MaterialCommunityIcons name="refresh" size={24} color="white" />
+                  </TouchableOpacity>
+                </View>
+                
+                {pedidosDisponibles.length > 0 ? (
+                  pedidosDisponibles.map(renderPedidoCard)
+                ) : (
+                  <View style={styles.noPedidosContainer}>
+                    <MaterialCommunityIcons name="truck-outline" size={60} color="#666" />
+                    <Text style={styles.noPedidosTexto}>No hay pedidos disponibles</Text>
+                    <Text style={styles.noPedidosSubtexto}>Mantente conectado, pronto aparecerán nuevos pedidos</Text>
+                  </View>
+                )}
+              </View>
+            )}
+          </>
+        ) : (
+          // UI para usuario 'Particular'
+          <View style={{ padding: 24 }}>
+            <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold', marginBottom: 16 }}>
+              ¡Bienvenido, {user?.name || user?.email?.split('@')[0] || 'Usuario'}!
+            </Text>
+            <Text style={{ color: 'white', fontSize: 16 }}>
+              Aquí irá la interfaz para usuarios particulares. Puedes mostrar aquí tus envíos, historial, o un botón para crear un nuevo envío, etc.
+            </Text>
+            {/* Agrega aquí la UI específica para 'Particular' */}
           </View>
         )}
       </ScrollView>

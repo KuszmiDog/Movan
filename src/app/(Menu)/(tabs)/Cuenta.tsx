@@ -1,6 +1,7 @@
+import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useState, useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -14,6 +15,7 @@ import * as ImagePicker from 'expo-image-picker';
 export default function AccountScreen() {
   const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [phone, setPhone] = useState<string | null>(null);
   const { user, logout, updateUser, isLoading } = useAuth();
 
   // Cargar usuario directamente desde AsyncStorage
@@ -257,6 +259,21 @@ export default function AccountScreen() {
     changeProfilePhoto();
   };
 
+  useEffect(() => {
+    const fetchPhone = async () => {
+      try {
+        const datos = await AsyncStorage.getItem('datos_personales');
+        if (datos) {
+          const datosPersonales = JSON.parse(datos);
+          setPhone(datosPersonales.telefono || null);
+        }
+      } catch (error) {
+        console.log('Error obteniendo teléfono:', error);
+      }
+    };
+    fetchPhone();
+  }, []);
+
   return (
     <SafeAreaView style={styles.background}>
       <View style={styles.header}>
@@ -309,7 +326,7 @@ export default function AccountScreen() {
           </View>
           <View style={styles.infoItem}>
             <MaterialCommunityIcons name="phone" size={24} color="white" />
-            <Text style={styles.infoText}>{userInfo.phone}</Text>
+            <Text style={styles.infoText}>{phone ? phone : 'No registrado'}</Text>
           </View>
           <View style={styles.infoItem}>
             <MaterialCommunityIcons name="calendar" size={24} color="white" />

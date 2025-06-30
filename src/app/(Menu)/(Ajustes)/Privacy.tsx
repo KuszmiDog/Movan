@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Switch } from 'react-native';
 import { moderateScale, verticalScale } from 'react-native-size-matters';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 
 const Privacy = () => {
   const [settings, setSettings] = useState({
@@ -68,7 +69,10 @@ const Privacy = () => {
         </View>
 
         {/* Cambiar Contraseña */}
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={() => router.push('/(Menu)/(Ajustes)/ChangePassword')}
+        >
           <Text style={styles.actionButtonText}>Cambiar Contraseña</Text>
           <MaterialCommunityIcons name="chevron-right" size={24} color="white" />
         </TouchableOpacity>

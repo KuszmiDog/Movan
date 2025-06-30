@@ -18,6 +18,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useAuth } from '../../../utils/AuthContext';
 import { TransportistaService, DatosLicencia as DatosLicenciaInterface } from '../../../utils/TransportistaService';
+import styles from '@/src/constants/DatosLicencia_styles/DatosLicencia_styles';
 
 // Tipos de licencia
 const tiposLicencia = [
@@ -378,128 +379,5 @@ const DatosLicenciaComponent = () => {
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#565EB3',
-  },
-  header: {
-    alignItems: 'center',
-    paddingTop: verticalScale(40),
-    paddingHorizontal: moderateScale(20),
-    marginBottom: verticalScale(30),
-  },
-  title: {
-    fontSize: moderateScale(24),
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginTop: verticalScale(16),
-    marginBottom: verticalScale(8),
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: moderateScale(16),
-    color: 'rgba(255, 255, 255, 0.8)',
-    textAlign: 'center',
-    lineHeight: moderateScale(22),
-  },
-  form: {
-    paddingHorizontal: moderateScale(20),
-  },
-  inputGroup: {
-    marginBottom: verticalScale(20),
-  },
-  label: {
-    fontSize: moderateScale(16),
-    color: '#FFFFFF',
-    marginBottom: verticalScale(8),
-    fontWeight: '600',
-  },
-  subLabel: {
-    fontSize: moderateScale(14),
-    color: 'rgba(255, 255, 255, 0.7)',
-    marginBottom: verticalScale(12),
-    fontStyle: 'italic',
-  },
-  input: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: moderateScale(8),
-    paddingHorizontal: moderateScale(16),
-    paddingVertical: verticalScale(12),
-    fontSize: moderateScale(16),
-    color: '#333333',
-  },
-  textArea: {
-    height: verticalScale(80),
-    textAlignVertical: 'top',
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  halfWidth: {
-    width: '48%',
-  },
-  pickerContainer: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: moderateScale(8),
-    overflow: 'hidden',
-  },
-  picker: {
-    color: '#333333',
-  },
-  imageButton: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: moderateScale(8),
-    padding: moderateScale(20),
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#E0E0E0',
-    borderStyle: 'dashed',
-  },
-  imageButtonContent: {
-    alignItems: 'center',
-  },
-  imageButtonText: {
-    fontSize: moderateScale(16),
-    color: '#666',
-    marginTop: verticalScale(8),
-  },
-  imagePreview: {
-    alignItems: 'center',
-  },
-  imagePreviewImg: {
-    width: moderateScale(120),
-    height: moderateScale(80),
-    borderRadius: moderateScale(8),
-    marginBottom: verticalScale(8),
-  },
-  button: {
-    backgroundColor: '#262E93',
-    borderRadius: moderateScale(8),
-    paddingVertical: verticalScale(16),
-    alignItems: 'center',
-    marginTop: verticalScale(20),
-    marginBottom: verticalScale(30),
-  },
-  buttonDisabled: {
-    backgroundColor: '#8A8FB0',
-    opacity: 0.7,
-  },
-  buttonText: {
-    color: '#FFFFFF',
-    fontSize: moderateScale(18),
-    fontWeight: 'bold',
-  },
-  footer: {
-    alignItems: 'center',
-    paddingBottom: verticalScale(30),
-  },
-  footerText: {
-    color: 'rgba(255, 255, 255, 0.7)',
-    fontSize: moderateScale(14),
-  },
-});
 
 export default DatosLicenciaComponent;

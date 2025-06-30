@@ -19,7 +19,7 @@ const GOOGLE_MAPS_API_KEY = Constants.expoConfig?.extra?.GOOGLE_MAPS_API_KEY;
 type EstadoCamionero = 'disponible' | 'ocupado' | 'fuera_servicio';
 
 const MovanMenu = () => {
-  const { user, debugAuthState, reloadUser } = useAuth();
+  const { user, debugAuthState, reloadUser, getUserCredits, simulateRecharge, hasEnoughCredits, deductCredits } = useAuth();
   const { 
     setPedidoActivo: setPedidoActivoContext, 
     setDestinoNavegacion, 
@@ -33,6 +33,7 @@ const MovanMenu = () => {
   const [pedidosDisponibles, setPedidosDisponibles] = useState<Pedido[]>([]);
   const [pedidoActivo, setPedidoActivo] = useState<Pedido | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [userCredits, setUserCredits] = useState<number>(0);
   const [nuevoPost, setNuevoPost] = useState<{
     tipo: string;
     peso: string;
@@ -120,7 +121,21 @@ const MovanMenu = () => {
 
   useEffect(() => {
     cargarPedidosDisponibles();
-  }, []);
+    // Cargar créditos si es transportista
+    if (user?.role === 'Private') {
+      cargarCreditos();
+    }
+  }, [user?.role]);
+
+  // Función para cargar créditos del usuario
+  const cargarCreditos = async () => {
+    try {
+      const credits = await getUserCredits();
+      setUserCredits(credits);
+    } catch (error) {
+      console.error('Error cargando créditos:', error);
+    }
+  };
 
   // Sincronizar estado local con contexto
   useEffect(() => {
@@ -144,7 +159,57 @@ const MovanMenu = () => {
   const onRefresh = async () => {
     setRefreshing(true);
     await cargarPedidosDisponibles();
+    if (user?.role === 'Private') {
+      await cargarCreditos();
+    }
     setRefreshing(false);
+  };
+
+  // Función para recargar créditos (simulada)
+  const handleCreditRecharge = () => {
+    Alert.alert(
+      'Recargar Créditos',
+      'Selecciona la cantidad de créditos a recargar:',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { 
+          text: '5 Créditos - $5.000', 
+          onPress: async () => {
+            const success = await simulateRecharge(5);
+            if (success) {
+              await cargarCreditos();
+              Alert.alert('¡Éxito!', 'Se han agregado 5 créditos a tu cuenta.');
+            } else {
+              Alert.alert('Error', 'No se pudieron agregar los créditos.');
+            }
+          } 
+        },
+        { 
+          text: '10 Créditos - $9.000', 
+          onPress: async () => {
+            const success = await simulateRecharge(10);
+            if (success) {
+              await cargarCreditos();
+              Alert.alert('¡Éxito!', 'Se han agregado 10 créditos a tu cuenta.');
+            } else {
+              Alert.alert('Error', 'No se pudieron agregar los créditos.');
+            }
+          } 
+        },
+        { 
+          text: '20 Créditos - $16.000', 
+          onPress: async () => {
+            const success = await simulateRecharge(20);
+            if (success) {
+              await cargarCreditos();
+              Alert.alert('¡Éxito!', 'Se han agregado 20 créditos a tu cuenta.');
+            } else {
+              Alert.alert('Error', 'No se pudieron agregar los créditos.');
+            }
+          } 
+        },
+      ]
+    );
   };
 
   const cambiarEstado = () => {
@@ -161,42 +226,73 @@ const MovanMenu = () => {
     );
   };
 
-  const aceptarPedido = (pedido: Pedido) => {
+  const aceptarPedido = async (pedido: Pedido) => {
+    // Verificar si tiene suficientes créditos
+    const hasSufficientCredits = await hasEnoughCredits(1);
+    
+    if (!hasSufficientCredits) {
+      Alert.alert(
+        'Créditos Insuficientes',
+        'Necesitas al menos 1 crédito para aceptar un pedido. ¿Deseas recargar créditos?',
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          { text: 'Recargar', onPress: handleCreditRecharge }
+        ]
+      );
+      return;
+    }
+
     Alert.alert(
       'Aceptar Pedido',
-      `¿Confirmas que quieres aceptar el pedido de ${pedido.cliente.nombre}?\n\nPago: $${pedido.precio}`,
+      `¿Confirmas que quieres aceptar el pedido de ${pedido.cliente.nombre}?\n\nPago: $${pedido.precio}\nCosto: 1 crédito`,
       [
         { text: 'Cancelar', style: 'cancel' },
         {
           text: 'Aceptar',
-          onPress: () => {
-            // Actualizar estados locales
-            setPedidoActivo(pedido);
-            setEstadoCamionero('ocupado');
-            setPedidosDisponibles(prev => prev.filter(p => p.id !== pedido.id));
-            
-            // Actualizar contexto global
-            setPedidoActivoContext(pedido);
-            setEstadoPedido('recogiendo');
-            
-            // Configurar destino de navegación (origen del pedido)
-            setDestinoNavegacion({
-              latitude: pedido.origen.coordenadas.lat,
-              longitude: pedido.origen.coordenadas.lng,
-              address: pedido.origen.direccion
-            });
-            
-            // Mostrar alerta y navegar
-            Alert.alert(
-              '¡Pedido Aceptado!', 
-              'Te dirigiremos al mapa para navegar hacia el punto de recogida.',
-              [
-                {
-                  text: 'Ir al Mapa',
-                  onPress: () => router.push('/Buscar')
-                }
-              ]
-            );
+          onPress: async () => {
+            try {
+              // Deducir el crédito
+              const deductionSuccess = await deductCredits(1, `Pedido aceptado - ${pedido.cliente.nombre}`, pedido.id);
+              
+              if (!deductionSuccess) {
+                Alert.alert('Error', 'No se pudo procesar el pago del crédito. Intenta nuevamente.');
+                return;
+              }
+
+              // Actualizar contador de créditos local
+              await cargarCreditos();
+
+              // Actualizar estados locales
+              setPedidoActivo(pedido);
+              setEstadoCamionero('ocupado');
+              setPedidosDisponibles(prev => prev.filter(p => p.id !== pedido.id));
+              
+              // Actualizar contexto global
+              setPedidoActivoContext(pedido);
+              setEstadoPedido('recogiendo');
+              
+              // Configurar destino de navegación (origen del pedido)
+              setDestinoNavegacion({
+                latitude: pedido.origen.coordenadas.lat,
+                longitude: pedido.origen.coordenadas.lng,
+                address: pedido.origen.direccion
+              });
+              
+              // Mostrar alerta y navegar
+              Alert.alert(
+                '¡Pedido Aceptado!', 
+                'Se ha deducido 1 crédito de tu cuenta. Te dirigiremos al mapa para navegar hacia el punto de recogida.',
+                [
+                  {
+                    text: 'Ir al Mapa',
+                    onPress: () => router.push('/Buscar')
+                  }
+                ]
+              );
+            } catch (error) {
+              console.error('Error aceptando pedido:', error);
+              Alert.alert('Error', 'Ocurrió un error al aceptar el pedido. Intenta nuevamente.');
+            }
           }
         }
       ]
@@ -607,33 +703,47 @@ const MovanMenu = () => {
               month: 'long'
             })}
           </Text>
-          
-          {/* Botón temporal para debug de autenticación */}
-          {__DEV__ && (
-            <TouchableOpacity
-              style={{
-                backgroundColor: 'purple',
-                padding: 8,
-                borderRadius: 5,
-                marginTop: 10,
-                alignSelf: 'center'
-              }}
-              onPress={async () => {
-                console.log('🔧 DEBUG AUTH STATE COMPLETO:');
-                if (debugAuthState) {
-                  await debugAuthState();
-                } else {
-                  console.log('❌ debugAuthState no disponible');
-                }
-              }}
-            >
-              <Text style={{ color: 'white', fontSize: 12 }}>AUTH DEBUG</Text>
-            </TouchableOpacity>
-          )}
         </View>
 
         {user?.role === 'Private' ? (
           <>
+            {/* Aviso de créditos bajos */}
+            {userCredits < 3 && (
+              <View style={styles.lowCreditsWarning}>
+                <MaterialCommunityIcons name="alert" size={24} color="#FF6B35" />
+                <View style={styles.warningText}>
+                  <Text style={styles.warningTitle}>Créditos Bajos</Text>
+                  <Text style={styles.warningDescription}>
+                    Te quedan {userCredits} créditos. Recarga para no perderte pedidos.
+                  </Text>
+                </View>
+                <TouchableOpacity 
+                  style={styles.warningButton}
+                  onPress={() => router.push('/(Menu)/(Transportista)/CreditRecharge')}
+                >
+                  <Text style={styles.warningButtonText}>Recargar</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {/* Contador de créditos para transportistas */}
+            <View style={styles.creditContainer}>
+              <TouchableOpacity 
+                style={styles.creditDisplay}
+                onPress={() => router.push('/(Menu)/(Transportista)/CreditHistory')}
+              >
+                <MaterialCommunityIcons name="cash" size={24} color="#FFD700" />
+                <Text style={styles.creditText}>{userCredits} créditos</Text>
+                <MaterialCommunityIcons name="chevron-right" size={16} color="rgba(255,255,255,0.6)" style={{ marginLeft: 8 }} />
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.rechargeButton}
+                onPress={() => router.push('/(Menu)/(Transportista)/CreditRecharge')}
+              >
+                <MaterialCommunityIcons name="plus" size={20} color="white" />
+              </TouchableOpacity>
+            </View>
+
             <TouchableOpacity style={styles.estadoContainer} onPress={cambiarEstado}>
               <View style={[styles.estadoIndicador, { backgroundColor: getEstadoColor() }]} />
               <Text style={styles.estadoTexto}>{getEstadoTexto()}</Text>

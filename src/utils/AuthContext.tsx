@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { UserService } from './UserService';
+import { CreditService, CreditTransaction } from './CreditService';
 
 export interface User {
   id: string;
@@ -22,6 +23,13 @@ interface AuthContextType {
   completeOnboarding: () => Promise<void>;
   reloadUser: () => Promise<void>;
   debugAuthState?: () => Promise<void>;
+  // Funciones de créditos
+  getUserCredits: () => Promise<number>;
+  addCredits: (amount: number, reason?: string) => Promise<boolean>;
+  deductCredits: (amount: number, reason?: string, orderId?: string) => Promise<boolean>;
+  hasEnoughCredits: (amount: number) => Promise<boolean>;
+  getCreditHistory: () => Promise<CreditTransaction[]>;
+  simulateRecharge: (amount: number) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -247,6 +255,37 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  // Funciones de créditos
+  const getUserCredits = async (): Promise<number> => {
+    if (!user) return 0;
+    return await CreditService.getUserCredits(user.id);
+  };
+
+  const addCredits = async (amount: number, reason: string = 'Recarga'): Promise<boolean> => {
+    if (!user) return false;
+    return await CreditService.addCredits(user.id, amount, reason);
+  };
+
+  const deductCredits = async (amount: number, reason: string = 'Uso de servicio', orderId?: string): Promise<boolean> => {
+    if (!user) return false;
+    return await CreditService.deductCredits(user.id, amount, reason, orderId);
+  };
+
+  const hasEnoughCredits = async (amount: number): Promise<boolean> => {
+    if (!user) return false;
+    return await CreditService.hasEnoughCredits(user.id, amount);
+  };
+
+  const getCreditHistory = async (): Promise<CreditTransaction[]> => {
+    if (!user) return [];
+    return await CreditService.getCreditHistory(user.id);
+  };
+
+  const simulateRecharge = async (amount: number): Promise<boolean> => {
+    if (!user) return false;
+    return await CreditService.simulateRecharge(user.id, amount);
+  };
+
   const value: AuthContextType = {
     user,
     isLoading,
@@ -258,6 +297,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     completeOnboarding,
     reloadUser,
     debugAuthState,
+    getUserCredits,
+    addCredits,
+    deductCredits,
+    hasEnoughCredits,
+    getCreditHistory,
+    simulateRecharge,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -350,6 +350,73 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginHorizontal: 4,
   },
+  // Estilos para el contador de créditos
+  creditContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#262E93',
+    marginHorizontal: moderateScale(20),
+    marginBottom: verticalScale(15),
+    padding: moderateScale(15),
+    borderRadius: moderateScale(10),
+    borderWidth: 1,
+    borderColor: '#FFD700',
+  },
+  creditDisplay: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  creditText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginLeft: moderateScale(8),
+  },
+  rechargeButton: {
+    backgroundColor: '#4CAF50',
+    width: moderateScale(36),
+    height: moderateScale(36),
+    borderRadius: moderateScale(18),
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  // Estilos para el aviso de créditos bajos
+  lowCreditsWarning: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FF6B35',
+    marginHorizontal: moderateScale(20),
+    marginBottom: verticalScale(15),
+    padding: moderateScale(15),
+    borderRadius: moderateScale(10),
+  },
+  warningText: {
+    flex: 1,
+    marginLeft: moderateScale(10),
+  },
+  warningTitle: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  warningDescription: {
+    color: 'white',
+    fontSize: 14,
+    opacity: 0.9,
+    marginTop: 2,
+  },
+  warningButton: {
+    backgroundColor: 'white',
+    paddingHorizontal: moderateScale(12),
+    paddingVertical: verticalScale(6),
+    borderRadius: moderateScale(15),
+  },
+  warningButtonText: {
+    color: '#FF6B35',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
 });
 
 export default styles;

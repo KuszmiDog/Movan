@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { CreditService } from './CreditService';
 
 export interface User {
   id: string;
@@ -206,11 +207,19 @@ export class UserService {
         return { success: false, message: 'Usuario no encontrado' };
       }
 
+      const previousRole = users[userIndex].role;
+
       // Actualizar el rol
       users[userIndex].role = role;
 
       // Guardar la lista actualizada
       await AsyncStorage.setItem(USERS_KEY, JSON.stringify(users));
+
+      // Si el usuario cambia a 'Private' (transportista), inicializar créditos
+      if (role === 'Private' && previousRole !== 'Private') {
+        console.log('🪙 Inicializando créditos para nuevo transportista...');
+        await CreditService.initializeTransportistCredits(userId);
+      }
 
       // Actualizar usuario actual si es el mismo
       const currentUser = await this.getCurrentUser();

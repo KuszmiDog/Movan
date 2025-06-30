@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -14,6 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { moderateScale, verticalScale } from 'react-native-size-matters';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuth } from '../../../utils/AuthContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface DatosPersonales {
   nombre: string;
@@ -34,6 +35,19 @@ const IndividualIDComponent = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { user, completeOnboarding } = useAuth();
   const router = useRouter();
+
+  useEffect(() => {
+    const fetchDatosPersonales = async () => {
+      const datos = await AsyncStorage.getItem('datos_personales');
+      const datosPersonales = datos ? JSON.parse(datos) : null;
+
+      if (datosPersonales) {
+        setDatosPersonales(datosPersonales);
+      }
+    };
+
+    fetchDatosPersonales();
+  }, []);
 
   const actualizarDato = (campo: keyof DatosPersonales, valor: string) => {
     setDatosPersonales(prev => ({
@@ -75,11 +89,11 @@ const IndividualIDComponent = () => {
 
   const handleFinalizar = async () => {
     if (isLoading) return;
-    
+
     if (!validarFormulario()) return;
-    
+
     setIsLoading(true);
-    
+
     try {
       // Verificar que hay un usuario autenticado
       if (!user) {
@@ -87,14 +101,14 @@ const IndividualIDComponent = () => {
         return;
       }
 
-      // Aquí podrías guardar los datos adicionales del usuario particular
-      // Por ahora simplemente mostraremos un mensaje de éxito
-      
+      // Guardar datos personales en AsyncStorage
+      await AsyncStorage.setItem('datos_personales', JSON.stringify(datosPersonales));
+
       console.log('Datos personales del usuario particular:', datosPersonales);
-      
+
       // Marcar el onboarding como completado
       await completeOnboarding();
-      
+
       Alert.alert(
         '¡Registro Completado!',
         'Tu perfil de usuario particular ha sido completado exitosamente. Ya puedes comenzar a enviar cargas.',
@@ -108,7 +122,7 @@ const IndividualIDComponent = () => {
           }
         ]
       );
-      
+
     } catch (error) {
       console.error('Error completando registro:', error);
       Alert.alert('Error', 'Ocurrió un error al completar el registro. Intenta nuevamente.');

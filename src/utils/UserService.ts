@@ -279,4 +279,19 @@ export class UserService {
       console.error('Error limpiando usuarios:', error);
     }
   }
+
+  static async changePassword(email: string, oldPassword: string, newPassword: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const users = await this.getUsers();
+      const idx = users.findIndex(u => u.email === email && u.password === oldPassword);
+      if (idx === -1) {
+        return { success: false, message: 'Contraseña actual incorrecta' };
+      }
+      users[idx].password = newPassword;
+      await AsyncStorage.setItem(USERS_KEY, JSON.stringify(users));
+      return { success: true, message: 'Contraseña actualizada' };
+    } catch (error) {
+      return { success: false, message: 'Error al cambiar la contraseña' };
+    }
+  }
 }

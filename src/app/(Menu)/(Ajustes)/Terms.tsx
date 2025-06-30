@@ -52,7 +52,7 @@ const Terms = () => {
         </View>
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}>Última actualización: Mayo 2025</Text>
+          <Text style={styles.footerText}>Última actualización: Junio 2025</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -63,10 +63,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#565EB3',
+    textAlign: 'center',
+    padding: moderateScale(1),
   },
   header: {
     padding: verticalScale(20),
     alignItems: 'center',
+    
   },
   title: {
     fontSize: 24,

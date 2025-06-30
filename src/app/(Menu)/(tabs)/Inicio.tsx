@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, BackHandler, Alert, RefreshControl } from 'react-native';
+import 'react-native-get-random-values';
+import React, { useEffect, useState, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, BackHandler, Alert, RefreshControl, TextInput, Modal } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { moderateScale, verticalScale } from 'react-native-size-matters';
 import { useAuth } from '../../../utils/AuthContext';
@@ -8,6 +9,10 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Pedido } from '@/src/components/UserPosts/SimulatedPosts';
 import { pedidosSimulados } from '@/src/components/UserPosts/SimulatedPosts';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import Constants from 'expo-constants';
+
+const GOOGLE_MAPS_API_KEY = Constants.expoConfig?.extra?.GOOGLE_MAPS_API_KEY;
 
 type EstadoCamionero = 'disponible' | 'ocupado' | 'fuera_servicio';
 
@@ -26,6 +31,24 @@ const MovanMenu = () => {
   const [pedidosDisponibles, setPedidosDisponibles] = useState<Pedido[]>([]);
   const [pedidoActivo, setPedidoActivo] = useState<Pedido | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [nuevoPost, setNuevoPost] = useState<{
+    tipo: string;
+    peso: string;
+    descripcion: string;
+    origen: { direccion: string; coordenadas: { lat: number | null; lng: number | null } };
+    destino: { direccion: string; coordenadas: { lat: number | null; lng: number | null } };
+    prioridad: string;
+  }>({
+    tipo: '',
+    peso: '',
+    descripcion: '',
+    origen: { direccion: '', coordenadas: { lat: null, lng: null } },
+    destino: { direccion: '', coordenadas: { lat: null, lng: null } },
+    prioridad: 'normal',
+  });
+  const [step, setStep] = useState(1);
+  const [showOrigenModal, setShowOrigenModal] = useState(false);
+  const [showDestinoModal, setShowDestinoModal] = useState(false);
 
   // Manejar el botón atrás para mostrar alerta de cerrar app
   useEffect(() => {
@@ -216,13 +239,247 @@ const MovanMenu = () => {
     </View>
   );
 
+  const renderParticularUI = () => (
+    <View style={{ padding: 24 }}>
+      <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold', marginBottom: 16 }}>
+        ¡Bienvenido, {user?.name || user?.email?.split('@')[0] || 'Usuario'}!
+      </Text>
+      <Text style={{ color: 'white', fontSize: 16, marginBottom: 16 }}>
+        Crea un nuevo envío completando los datos:
+      </Text>
+
+      {/* Paso 1: Datos de la carga */}
+      {step === 1 && (
+        <>
+          <Text style={{ color: 'white', marginBottom: 8 }}>Tipo de carga</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Ej: Electrodomésticos"
+            value={nuevoPost.tipo}
+            onChangeText={v => setNuevoPost({ ...nuevoPost, tipo: v })}
+            placeholderTextColor="#aaa"
+          />
+          <Text style={{ color: 'white', marginBottom: 8 }}>Peso (kg)</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Ej: 500"
+            value={nuevoPost.peso}
+            onChangeText={v => setNuevoPost({ ...nuevoPost, peso: v.replace(/[^0-9]/g, '') })}
+            keyboardType="numeric"
+            placeholderTextColor="#aaa"
+          />
+          <Text style={{ color: 'white', marginBottom: 8 }}>Descripción</Text>
+          <TextInput
+            style={[styles.input, { height: 60 }]}
+            placeholder="Detalles de la carga"
+            value={nuevoPost.descripcion}
+            onChangeText={v => setNuevoPost({ ...nuevoPost, descripcion: v })}
+            multiline
+            placeholderTextColor="#aaa"
+          />
+          <TouchableOpacity
+            style={[styles.navegarButton, { marginTop: 16 }]}
+            onPress={() => setStep(2)}
+            disabled={!nuevoPost.tipo || !nuevoPost.peso || !nuevoPost.descripcion}
+          >
+            <Text style={styles.navegarButtonText}>Siguiente</Text>
+          </TouchableOpacity>
+        </>
+      )}
+
+      {/* Paso 2: Origen y destino */}
+      {step === 2 && (
+        <>
+          <Text style={{ color: 'white', marginBottom: 8 }}>Origen</Text>
+          <TouchableOpacity
+            style={styles.input}
+            onPress={() => setShowOrigenModal(true)}
+          >
+            <Text style={{ color: nuevoPost.origen.direccion ? '#222' : '#aaa' }}>
+              {nuevoPost.origen.direccion || 'Buscar dirección de origen'}
+            </Text>
+          </TouchableOpacity>
+          <Modal visible={showOrigenModal} animationType="slide" transparent>
+            <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.15)', justifyContent: 'flex-end' }}>
+              <View style={{
+                backgroundColor: '#fff',
+                borderTopLeftRadius: 24,
+                borderTopRightRadius: 24,
+                padding: 24,
+                paddingBottom: 0,
+                minHeight: '50%',
+                justifyContent: 'flex-start'
+              }}>
+                <GooglePlacesAutocomplete
+                  placeholder="Buscar dirección de origen"
+                  onPress={(data, details = null) => {
+                    const loc = details?.geometry.location;
+                    setNuevoPost({
+                      ...nuevoPost,
+                      origen: {
+                        direccion: data.description,
+                        coordenadas: { lat: loc.lat, lng: loc.lng }
+                      }
+                    });
+                    setShowOrigenModal(false);
+                  }}
+                  fetchDetails
+                  query={{
+                    key: GOOGLE_MAPS_API_KEY,
+                    language: 'es',
+                  }}
+                  styles={{
+                    textInput: styles.input,
+                    listView: { backgroundColor: 'white' },
+                  }}
+                />
+              </View>
+              <TouchableOpacity
+                style={{
+                  width: '100%',
+                  backgroundColor: '#FF6B35',
+                  paddingVertical: 18,
+                  alignItems: 'center',
+                  borderBottomLeftRadius: 24,
+                  borderBottomRightRadius: 24,
+                }}
+                onPress={() => setShowOrigenModal(false)}
+                activeOpacity={0.8}
+              >
+                <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 18 }}>Cerrar</Text>
+              </TouchableOpacity>
+            </View>
+          </Modal>
+
+          <Text style={{ color: 'white', marginBottom: 8, marginTop: 16 }}>Destino</Text>
+          <TouchableOpacity
+            style={styles.input}
+            onPress={() => setShowDestinoModal(true)}
+          >
+            <Text style={{ color: nuevoPost.destino.direccion ? '#222' : '#aaa' }}>
+              {nuevoPost.destino.direccion || 'Buscar dirección de destino'}
+            </Text>
+          </TouchableOpacity>
+          <Modal visible={showDestinoModal} animationType="slide" transparent>
+            <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.15)', justifyContent: 'flex-end' }}>
+              <View style={{
+                backgroundColor: '#fff',
+                borderTopLeftRadius: 24,
+                borderTopRightRadius: 24,
+                padding: 24,
+                paddingBottom: 0,
+                minHeight: '50%',
+                justifyContent: 'flex-start'
+              }}>
+                <GooglePlacesAutocomplete
+                  placeholder="Buscar dirección de destino"
+                  onPress={(data, details = null) => {
+                    const loc = details?.geometry.location;
+                    setNuevoPost({
+                      ...nuevoPost,
+                      destino: {
+                        direccion: data.description,
+                        coordenadas: { lat: loc.lat, lng: loc.lng }
+                      }
+                    });
+                    setShowDestinoModal(false);
+                  }}
+                  fetchDetails
+                  query={{
+                    key: GOOGLE_MAPS_API_KEY,
+                    language: 'es',
+                  }}
+                  styles={{
+                    textInput: styles.input,
+                    listView: { backgroundColor: 'white' },
+                  }}
+                />
+              </View>
+              <TouchableOpacity
+                style={{
+                  width: '100%',
+                  backgroundColor: '#FF6B35',
+                  paddingVertical: 18,
+                  alignItems: 'center',
+                  borderBottomLeftRadius: 24,
+                  borderBottomRightRadius: 24,
+                }}
+                onPress={() => setShowDestinoModal(false)}
+                activeOpacity={0.8}
+              >
+                <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 18 }}>Cerrar</Text>
+              </TouchableOpacity>
+            </View>
+          </Modal>
+
+          <TouchableOpacity
+            style={[styles.navegarButton, { marginTop: 16 }]}
+            onPress={() => setStep(3)}
+            disabled={
+              !nuevoPost.origen.direccion ||
+              !nuevoPost.origen.coordenadas.lat ||
+              !nuevoPost.destino.direccion ||
+              !nuevoPost.destino.coordenadas.lat
+            }
+          >
+            <Text style={styles.navegarButtonText}>Siguiente</Text>
+          </TouchableOpacity>
+        </>
+      )}
+
+      {/* Paso 3: Prioridad y Confirmar */}
+      {step === 3 && (
+        <>
+          <Text style={{ color: 'white', marginBottom: 8 }}>Prioridad</Text>
+          <View style={{ flexDirection: 'row', marginBottom: 16 }}>
+            <TouchableOpacity
+              style={[
+                styles.prioridadButton,
+                nuevoPost.prioridad === 'normal' && { backgroundColor: '#4CAF50' }
+              ]}
+              onPress={() => setNuevoPost({ ...nuevoPost, prioridad: 'normal' })}
+            >
+              <Text style={{ color: 'white' }}>Normal</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.prioridadButton,
+                nuevoPost.prioridad === 'urgente' && { backgroundColor: '#FF6B35' }
+              ]}
+              onPress={() => setNuevoPost({ ...nuevoPost, prioridad: 'urgente' })}
+            >
+              <Text style={{ color: 'white' }}>Urgente</Text>
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity
+            style={[styles.navegarButton, { marginTop: 16 }]}
+            onPress={() => {
+              Alert.alert('¡Post creado!', 'Tu pedido fue creado correctamente.');
+              setStep(1);
+              setNuevoPost({
+                tipo: '',
+                peso: '',
+                descripcion: '',
+                origen: { direccion: '', coordenadas: { lat: null, lng: null } },
+                destino: { direccion: '', coordenadas: { lat: null, lng: null } },
+                prioridad: 'normal',
+              });
+            }}
+          >
+            <Text style={styles.navegarButtonText}>Crear Pedido</Text>
+          </TouchableOpacity>
+        </>
+      )}
+    </View>
+  );
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView 
         style={styles.scrollContainer}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        keyboardShouldPersistTaps="handled"
       >
-        {/* Header con saludo personalizado */}
         <View style={styles.header}>
           <Text style={styles.welcomeText}>
             ¡Hola, {user?.name || user?.email?.split('@')[0] || 'Usuario'}!
@@ -236,17 +493,14 @@ const MovanMenu = () => {
           </Text>
         </View>
 
-        {/* Renderiza según el rol */}
         {user?.role === 'Private' ? (
           <>
-            {/* Estado del camionero */}
             <TouchableOpacity style={styles.estadoContainer} onPress={cambiarEstado}>
               <View style={[styles.estadoIndicador, { backgroundColor: getEstadoColor() }]} />
               <Text style={styles.estadoTexto}>{getEstadoTexto()}</Text>
               <MaterialCommunityIcons name="chevron-down" size={20} color="white" />
             </TouchableOpacity>
 
-            {/* Estadísticas del día */}
             <View style={styles.statsContainer}>
               <View style={styles.statCard}>
                 <MaterialCommunityIcons name="truck-delivery" size={28} color="white" />
@@ -261,12 +515,10 @@ const MovanMenu = () => {
               </View>
             </View>
 
-            {/* Pedido activo si existe */}
             {pedidoActivo && (
               <View style={styles.pedidoActivoContainer}>
                 <Text style={styles.sectionTitle}>🚛 Pedido Activo</Text>
                 <View style={styles.pedidoActivoCard}>
-                  {/* Header con información del cliente y estado */}
                   <View style={styles.pedidoActivoHeader}>
                     <View style={styles.clienteActivoInfo}>
                       <Text style={styles.clienteActivoNombre}>{pedidoActivo.cliente.nombre}</Text>
@@ -282,7 +534,6 @@ const MovanMenu = () => {
                     </Text>
                   </View>
 
-                  {/* Información de la ruta */}
                   <View style={styles.rutaActivaContainer}>
                     <View style={styles.direccionRow}>
                       <MaterialCommunityIcons 
@@ -313,7 +564,6 @@ const MovanMenu = () => {
                     </View>
                   </View>
 
-                  {/* Detalles del pedido */}
                   <View style={styles.detallesActivoContainer}>
                     <View style={styles.detalleActivo}>
                       <MaterialCommunityIcons name="package-variant" size={18} color="rgba(255,255,255,0.8)" />
@@ -329,7 +579,6 @@ const MovanMenu = () => {
                     </View>
                   </View>
 
-                  {/* Botones de acción */}
                   <View style={styles.botonesContainer}>
                     <TouchableOpacity 
                       style={styles.navegarButton}
@@ -387,7 +636,6 @@ const MovanMenu = () => {
               </View>
             )}
 
-            {/* Pedidos disponibles */}
             {estadoCamionero === 'disponible' && !pedidoActivo && (
               <View style={styles.pedidosContainer}>
                 <View style={styles.sectionHeader}>
@@ -410,16 +658,7 @@ const MovanMenu = () => {
             )}
           </>
         ) : (
-          // UI para usuario 'Particular'
-          <View style={{ padding: 24 }}>
-            <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold', marginBottom: 16 }}>
-              ¡Bienvenido, {user?.name || user?.email?.split('@')[0] || 'Usuario'}!
-            </Text>
-            <Text style={{ color: 'white', fontSize: 16 }}>
-              Aquí irá la interfaz para usuarios particulares. Puedes mostrar aquí tus envíos, historial, o un botón para crear un nuevo envío, etc.
-            </Text>
-            {/* Agrega aquí la UI específica para 'Particular' */}
-          </View>
+          renderParticularUI()
         )}
       </ScrollView>
     </SafeAreaView>
@@ -758,6 +997,22 @@ const styles = StyleSheet.create({
     opacity: 0.7,
     textAlign: 'center',
     marginTop: verticalScale(5),
+  },
+  input: {
+    backgroundColor: 'white',
+    borderRadius: 8,
+    padding: 10,
+    fontSize: 16,
+    marginBottom: 12,
+    color: '#222',
+  },
+  prioridadButton: {
+    flex: 1,
+    backgroundColor: '#565EB3',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginHorizontal: 4,
   },
 });
 

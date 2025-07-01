@@ -123,16 +123,29 @@ export class CreditService {
   // Inicializar créditos para nuevo transportista (5 créditos iniciales)
   static async initializeTransportistCredits(userId: string): Promise<boolean> {
     try {
+      console.log('🪙 Iniciando proceso de inicialización de créditos para usuario:', userId);
+      
       const currentCredits = await this.getUserCredits(userId);
+      console.log('🪙 Créditos actuales del usuario:', currentCredits);
       
       // Solo inicializar si no tiene créditos
       if (currentCredits === 0) {
-        return await this.addCredits(userId, 5, 'Créditos iniciales de bienvenida');
+        console.log('🪙 Usuario sin créditos, agregando 5 créditos de bienvenida...');
+        const success = await this.addCredits(userId, 5, 'Créditos iniciales de bienvenida');
+        
+        if (success) {
+          console.log('✅ Créditos iniciales agregados exitosamente');
+        } else {
+          console.error('❌ Error agregando créditos iniciales');
+        }
+        
+        return success;
+      } else {
+        console.log('ℹ️ Usuario ya tiene créditos, no se agregan créditos adicionales');
+        return true;
       }
-      
-      return true;
     } catch (error) {
-      console.error('Error inicializando créditos de transportista:', error);
+      console.error('❌ Error inicializando créditos de transportista:', error);
       return false;
     }
   }

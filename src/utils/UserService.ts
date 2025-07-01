@@ -175,8 +175,25 @@ export class UserService {
         return { success: false, message: 'Usuario no encontrado' };
       }
       
+      // Guardar el rol anterior para detectar cambios
+      const previousRole = users[userIndex].role;
+      
       // Actualizar los datos del usuario
       users[userIndex] = { ...users[userIndex], ...updateData };
+      
+      // Si se está actualizando el rol a 'Private' y antes no era 'Private', inicializar créditos
+      if (updateData.role === 'Private' && previousRole !== 'Private') {
+        console.log('🚛 Usuario cambiando a rol de transportista. Rol anterior:', previousRole, '-> Nuevo rol:', updateData.role);
+        console.log('🪙 Inicializando créditos para nuevo transportista...');
+        
+        const creditResult = await CreditService.initializeTransportistCredits(userId);
+        
+        if (creditResult) {
+          console.log('✅ Créditos inicializados exitosamente para el transportista');
+        } else {
+          console.error('❌ Error inicializando créditos para el transportista');
+        }
+      }
       
       // Guardar la lista actualizada
       await AsyncStorage.setItem(USERS_KEY, JSON.stringify(users));

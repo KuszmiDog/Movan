@@ -1,5 +1,5 @@
 
-export const first_terms = { description: `Movan es una plataforma de intermediación que permite la comunicación entre transportistas privados y particulares para gestionar traslados, entregas o servicios vinculados al rubro del transporte. Movan no es una empresa de transporte, ni garantiza la calidad ni disponibilidad de los servicios ofrecidos por los usuarios. Para mas informacion sobre los terminos y servicios pulsa` }; 
+export const first_terms = { description: `Movan es una plataforma de intermediación que permite la comunicación entre transportistas privados y particulares para gestionar traslados, entregas o servicios vinculados al rubro del transporte. Movan no es una empresa de transporte, ni garantiza la calidad ni disponibilidad de los servicios ofrecidos por los usuarios.` };
 
 
 export const expanded_terms = {

@@ -39,13 +39,22 @@ const TermsAndCon = () => {
                 </View>
             )}
 
-            <Text style={styles.text}>
-                {first_terms.description}
-            </Text>
+            {/* Card de términos y condiciones */}
+            <View style={styles.termsCard}>
+                <MaterialCommunityIcons
+                    name="file-document-outline"
+                    size={40}
+                    color={colors.primary}
+                    style={{ marginBottom: 8 }}
+                />
+                <Text style={styles.termsText}>
+                    {first_terms.description}
+                </Text>
+            </View>
 
             <TouchableOpacity style={styles.infoButton} onPress={() => setInfoVisible(true)}>
                 <MaterialCommunityIcons name="information-outline" size={28} color={colors.white} />
-                <Text style={styles.text}> Leer mas</Text>
+                <Text style={styles.text}>Conocer más acerca de los términos</Text>
             </TouchableOpacity>
 
             <CheckBox  
@@ -54,7 +63,7 @@ const TermsAndCon = () => {
                 ]}
                 checkedvalues={states}
                 OnChange={setState}
-                style={{ marginBottom: 15 }}
+                style={{ marginBottom: 35 }}
             />
         </View>
     )
@@ -67,12 +76,12 @@ const styles = StyleSheet.create({
         fontFamily: "Roboto"
     },
     container: {
-        top: 110,
+        top: 40,
         margin: 18,
         padding: 18,
     },
     buttonlocation:{
-        top: verticalScale(160),
+        top: verticalScale(480),
         width: "100%",
         left: moderateScale(20),
         position: "absolute",
@@ -82,11 +91,11 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         display: 'flex',
         flexDirection: 'row',
-        gap: 10,
+        gap: 5,
         position: 'relative',
         top: 0,
         right: 0,
-        padding: 6        
+        padding: 10,        
     },
     modalOverlay: {
         flex: 1,
@@ -108,7 +117,7 @@ const styles = StyleSheet.create({
         color: colors.primary,
     },
     modalText: {
-        fontSize: 15,
+        fontSize: 14,
         color: colors.primary,
         marginBottom: 20,
         textAlign: 'center',
@@ -123,6 +132,21 @@ const styles = StyleSheet.create({
         color: 'white',
         fontWeight: 'bold',
         fontSize: 16,
+    },
+    termsCard: {
+        backgroundColor: "white",
+        borderRadius: 15,
+        padding: 26,
+        marginBottom: 5,
+        alignItems: 'center',
+        justifyContent: 'center',
+        elevation: 2,
+        height: 250,
+    },
+    termsText: {
+        color: "black",
+        fontSize: 14,
+        textAlign: 'center',
     },
 })
 

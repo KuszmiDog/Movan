@@ -10,6 +10,7 @@ export interface User {
   phone?: string;
   role?: 'Private' | 'Particular';
   isOnboardingComplete?: boolean;
+  hasCompletedProfile?: boolean; // Nueva flag para indicar si completó sus datos del perfil
 }
 
 interface AuthContextType {
@@ -21,6 +22,8 @@ interface AuthContextType {
   logout: () => Promise<void>;
   updateUser: (userData: Partial<User>) => Promise<void>;
   completeOnboarding: () => Promise<void>;
+  skipProfileCompletion: () => Promise<void>; // Nueva función para omitir completar datos
+  markProfileAsCompleted: () => Promise<void>; // Nueva función para marcar perfil como completado
   reloadUser: () => Promise<void>;
   debugAuthState?: () => Promise<void>;
   // Funciones de créditos
@@ -244,14 +247,61 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const completeOnboarding = async () => {
     try {
       if (user) {
-        const updatedUser = { ...user, isOnboardingComplete: true };
+        const updatedUser = { 
+          ...user, 
+          isOnboardingComplete: true,
+          hasCompletedProfile: true // Marcar perfil como completado también
+        };
         setUser(updatedUser);
         
         // Actualizar en UserService
-        await UserService.updateUser(user.id, { isOnboardingComplete: true });
+        await UserService.updateUser(user.id, { 
+          isOnboardingComplete: true,
+          hasCompletedProfile: true 
+        });
       }
     } catch (error) {
       console.error('Complete onboarding error:', error);
+    }
+  };
+
+  const skipProfileCompletion = async () => {
+    try {
+      if (user) {
+        const updatedUser = { 
+          ...user, 
+          isOnboardingComplete: true,
+          hasCompletedProfile: false 
+        };
+        setUser(updatedUser);
+        
+        // Actualizar en UserService
+        await UserService.updateUser(user.id, { 
+          isOnboardingComplete: true,
+          hasCompletedProfile: false 
+        });
+      }
+    } catch (error) {
+      console.error('Skip profile completion error:', error);
+    }
+  };
+
+  const markProfileAsCompleted = async () => {
+    try {
+      if (user) {
+        const updatedUser = { 
+          ...user, 
+          hasCompletedProfile: true 
+        };
+        setUser(updatedUser);
+        
+        // Actualizar en UserService
+        await UserService.updateUser(user.id, { 
+          hasCompletedProfile: true 
+        });
+      }
+    } catch (error) {
+      console.error('Mark profile as completed error:', error);
     }
   };
 
@@ -295,6 +345,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     logout,
     updateUser,
     completeOnboarding,
+    skipProfileCompletion,
+    markProfileAsCompleted,
     reloadUser,
     debugAuthState,
     getUserCredits,

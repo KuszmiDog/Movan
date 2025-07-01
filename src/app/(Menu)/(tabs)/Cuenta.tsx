@@ -47,7 +47,7 @@ export default function AccountScreen() {
     if (!currentUser) {
       loadUserData();
     }
-  }, [user?.id]); // Solo depender del ID para evitar bucles
+  }, [user?.id]);
 
   // Debug: verificar datos del usuario - Solo en desarrollo
   useEffect(() => {
@@ -55,7 +55,7 @@ export default function AccountScreen() {
       console.log('🔍 Usuario actual:', currentUser);
       console.log('🔍 Usuario en AuthContext:', user);
     }
-  }, [currentUser?.id, user?.id]); // Solo depender de IDs
+  }, [currentUser?.id, user?.id]);
 
   // Cargar foto de perfil guardada - optimizado para evitar re-renders innecesarios
   useFocusEffect(
@@ -78,7 +78,7 @@ export default function AccountScreen() {
       if (userToUse?.id) {
         loadPhoto();
       }
-    }, [currentUser?.id, user?.id, photoUri]) // Incluir photoUri para evitar sets innecesarios
+    }, [currentUser?.id, user?.id, photoUri]) 
   );
 
   // Función para seleccionar y cambiar la foto de perfil
@@ -261,8 +261,8 @@ export default function AccountScreen() {
     role: getUserRole(),
     phone: getUserPhone(),
     joinDate: getJoinDate(),
-    rating: 'Proximamente', // Estos pueden ser calculados basado en datos reales
-    completedDeliveries: 0 // Puede ser calculado desde datos de transportista
+    rating: 'Proximamente', 
+    completedDeliveries: 0 
   };
 
   if (__DEV__) {

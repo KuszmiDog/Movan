@@ -34,7 +34,7 @@ const IndividualIDComponent = () => {
     ciudad: ''
   });
   const [isLoading, setIsLoading] = useState(false);
-  const { user, completeOnboarding } = useAuth();
+  const { user, completeOnboarding, skipProfileCompletion } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -117,7 +117,6 @@ const IndividualIDComponent = () => {
           {
             text: 'Ir al Panel Principal',
             onPress: () => {
-              // Navegar al panel principal del usuario particular
               router.replace('/(Menu)/(tabs)/Inicio');
             }
           }
@@ -130,6 +129,46 @@ const IndividualIDComponent = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleOmitir = async () => {
+    if (isLoading) return;
+
+    Alert.alert(
+      'Omitir completar datos',
+      'Podrás completar tu información personal más tarde desde la configuración de tu cuenta.',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel'
+        },
+        {
+          text: 'Omitir por ahora',
+          onPress: async () => {
+            setIsLoading(true);
+            try {
+              // Verificar que hay un usuario autenticado
+              if (!user) {
+                Alert.alert('Error', 'No se encontró información del usuario');
+                return;
+              }
+
+              // Marcar el onboarding como completado pero perfil como incompleto
+              await skipProfileCompletion();
+
+              // Navegar al panel principal
+              router.replace('/(Menu)/(tabs)/Inicio');
+
+            } catch (error) {
+              console.error('Error omitiendo registro:', error);
+              Alert.alert('Error', 'Ocurrió un error. Intenta nuevamente.');
+            } finally {
+              setIsLoading(false);
+            }
+          }
+        }
+      ]
+    );
   };
 
   return (
@@ -218,6 +257,15 @@ const IndividualIDComponent = () => {
             ) : (
               <Text style={styles.buttonText}>Finalizar Registro</Text>
             )}
+          </TouchableOpacity>
+
+          {/* Botón Omitir por ahora */}
+          <TouchableOpacity
+            style={[styles.skipButton, isLoading && styles.buttonDisabled]}
+            onPress={handleOmitir}
+            disabled={isLoading}
+          >
+            <Text style={styles.skipButtonText}>Omitir por ahora</Text>
           </TouchableOpacity>
         </View>
 

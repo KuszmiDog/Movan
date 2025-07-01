@@ -9,6 +9,7 @@ export interface User {
   phone?: string;
   role?: 'Private' | 'Particular';
   isOnboardingComplete?: boolean;
+  hasCompletedProfile?: boolean; // Nueva propiedad para el estado del perfil
   createdAt: string;
 }
 
@@ -50,7 +51,7 @@ export class UserService {
         return { success: false, message: 'La contraseña no puede tener más de 50 caracteres' };
       }
 
-      // Validar que contenga al menos una letra y un número (opcional pero recomendado)
+      // Validar que contenga al menos una letra y un número
       const hasLetter = /[a-zA-Z]/.test(password);
       const hasNumber = /[0-9]/.test(password);
       
@@ -73,7 +74,7 @@ export class UserService {
       const newUser: User = {
         id: Date.now().toString(),
         email: email.toLowerCase(),
-        password, // En producción, deberías hashear la contraseña
+        password, 
         createdAt: new Date().toISOString(),
       };
       //OBTENER MAIL
@@ -106,7 +107,6 @@ export class UserService {
       
       if (user) {
         await AsyncStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
-        // Guardar el mail también al iniciar sesión
         await AsyncStorage.setItem('mail', user.email);
         return { success: true, message: 'Inicio de sesión exitoso', user };
       } else {
@@ -148,7 +148,6 @@ export class UserService {
       const result = await this.registerUser(userData.email, userData.password);
       
       if (result.success && result.user) {
-        // Actualizar con datos adicionales si se proporcionan
         if (userData.name) {
           const updatedUser = { ...result.user, name: userData.name };
           await this.updateUser(result.user.id, { name: userData.name });
@@ -241,7 +240,6 @@ export class UserService {
   }
 
   // Obtener usuario actual
-  // Obtener usuario actual por ID
   static async getCurrentUser(): Promise<User | null> {
     try {
       console.log('🔍 Buscando usuario actual...');
@@ -260,7 +258,7 @@ export class UserService {
         const currentUser = users.find(u => u.id === user.id);
         console.log('🔍 Usuario encontrado en lista:', currentUser);
         
-        const finalUser = currentUser || user; // Fallback al usuario guardado si no se encuentra en la lista
+        const finalUser = currentUser || user;
         console.log('✅ Usuario final a retornar:', finalUser);
         
         return finalUser;
@@ -294,7 +292,7 @@ export class UserService {
     }
   }
 
-  // Eliminar todos los usuarios (útil para desarrollo/testing)
+  // Eliminar todos los usuarios (NO SE USA EN PRODUCCIÓN)
   static async clearAllUsers(): Promise<void> {
     try {
       await AsyncStorage.removeItem(USERS_KEY);

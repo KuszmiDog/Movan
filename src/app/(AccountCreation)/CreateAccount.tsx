@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, Acti
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../../utils/AuthContext';
-import styles from '@/src/constants/CreateAccount_styles/CreateAccount_styles'; // Importa tus estilos
+import styles from '@/src/constants/CreateAccount_styles/CreateAccount_styles';
 
 
 const CreateAccount = () => {
@@ -59,7 +59,7 @@ const CreateAccount = () => {
             {
               text: 'Continuar',
               onPress: () => {
-                router.push('/(AccountCreation)/RolSelection'); // Navegar a RolSelection
+                router.push('/(AccountCreation)/RolSelection');
               }
             }
           ]

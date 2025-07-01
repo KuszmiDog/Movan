@@ -97,6 +97,20 @@ const styles = StyleSheet.create({
     fontSize: moderateScale(18),
     fontWeight: 'bold',
   },
+  skipButton: {
+    backgroundColor: 'transparent',
+    borderRadius: moderateScale(8),
+    paddingVertical: verticalScale(16),
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: 'rgba(255, 255, 255, 0.5)',
+    marginBottom: verticalScale(10),
+  },
+  skipButtonText: {
+    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: moderateScale(16),
+    fontWeight: '600',
+  },
   footer: {
     alignItems: 'center',
     paddingBottom: verticalScale(30),

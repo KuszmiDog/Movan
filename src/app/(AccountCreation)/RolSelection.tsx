@@ -49,7 +49,6 @@ const RolSelection = () => {
           {
             text: 'Continuar',
             onPress: () => {
-              // Navegar según el rol seleccionado
               if (selectedRole === 'Private') {
                 router.push('/(AccountCreation)/PrivateTransportLogic/DatosCamion');
               } else if (selectedRole === 'Particular') {

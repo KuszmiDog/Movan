@@ -17,6 +17,7 @@ import { moderateScale, verticalScale } from 'react-native-size-matters';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { UserService } from '../../../utils/UserService';
 import { TransportistaService, DatosVehiculo } from '../../../utils/TransportistaService';
+import { useAuth } from '../../../utils/AuthContext';
 
 // Opciones para el tipo de carga
 const tiposCarga = [
@@ -60,6 +61,7 @@ const DatosCamionComponent = () => {
     }
   });
   const [isLoading, setIsLoading] = useState(false);
+  const { user, skipProfileCompletion } = useAuth();
   const router = useRouter();
 
   const actualizarDato = (campo: keyof DatosVehiculoForm, valor: string) => {
@@ -183,6 +185,46 @@ const DatosCamionComponent = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleOmitir = async () => {
+    if (isLoading) return;
+
+    Alert.alert(
+      'Omitir completar datos',
+      'Podrás completar la información de tu vehículo y licencia más tarde desde la configuración de tu cuenta.',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel'
+        },
+        {
+          text: 'Omitir por ahora',
+          onPress: async () => {
+            setIsLoading(true);
+            try {
+              // Verificar que hay un usuario autenticado
+              if (!user) {
+                Alert.alert('Error', 'No se encontró información del usuario');
+                return;
+              }
+
+              // Marcar el onboarding como completado pero perfil como incompleto
+              await skipProfileCompletion();
+
+              // Navegar al panel principal de transportista
+              router.replace('/(Menu)/(tabs)/Inicio');
+
+            } catch (error) {
+              console.error('Error omitiendo registro:', error);
+              Alert.alert('Error', 'Ocurrió un error. Intenta nuevamente.');
+            } finally {
+              setIsLoading(false);
+            }
+          }
+        }
+      ]
+    );
   };
 
   return (
@@ -338,6 +380,15 @@ const DatosCamionComponent = () => {
             ) : (
               <Text style={styles.buttonText}>Continuar</Text>
             )}
+          </TouchableOpacity>
+
+          {/* Botón Omitir por ahora */}
+          <TouchableOpacity
+            style={[styles.skipButton, isLoading && styles.buttonDisabled]}
+            onPress={handleOmitir}
+            disabled={isLoading}
+          >
+            <Text style={styles.skipButtonText}>Omitir por ahora</Text>
           </TouchableOpacity>
         </View>
 

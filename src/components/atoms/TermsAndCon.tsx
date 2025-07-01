@@ -48,7 +48,7 @@ const TermsAndCon = () => {
                     style={{ marginBottom: 8 }}
                 />
                 <Text style={styles.termsText}>
-                    {first_terms.description}
+                    Para continuar, por favor acepta los términos y condiciones de uso de la aplicación.
                 </Text>
             </View>
 
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         elevation: 2,
-        height: 250,
+        height: 150,
     },
     termsText: {
         color: "black",

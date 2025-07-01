@@ -146,7 +146,7 @@ src/
 - **Inicio:** Dashboard principal diferenciado por rol
 - **Buscar:** Mapa interactivo con navegación
 - **Cuenta:** Perfil, configuraciones y estadísticas
-- **Créditos:** Recarga y historial (solo transportistas)
+- **Créditos:** Recarga e historial (solo transportistas)
 
 ## 🎯 Funcionalidades Futuras
 
